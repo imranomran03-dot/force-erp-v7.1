@@ -1,0 +1,16 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'ly.moi.forceerp'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'ly.moi.forceerp'
+        minSdk 26
+        targetSdk 35
+        versionCode 71
+        versionName "7.1.0"
+    }
+}
