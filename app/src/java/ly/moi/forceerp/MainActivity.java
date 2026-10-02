@@ -2,45 +2,362 @@ package ly.moi.forceerp;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.os.Bundle;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Bundle;
 import android.text.InputType;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Calendar;
+import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class MainActivity extends Activity {
 
-    private final int GREEN = Color.rgb(27, 94, 32);
-    private final int DARK_GREEN = Color.rgb(15, 61, 20);
-    private final int GOLD = Color.rgb(198, 160, 65);
-    private final int LIGHT = Color.rgb(245, 247, 248);
-    private final int WHITE = Color.WHITE;
-    private final int DARK = Color.rgb(30, 35, 40);
-    private final int GRAY = Color.rgb(100, 110, 120);
-    private final int BLUE = Color.rgb(25, 95, 160);
-    private final int RED = Color.rgb(170, 45, 45);
-    private final int ORANGE = Color.rgb(190, 110, 20);
+    private static final int GREEN = Color.rgb(27, 94, 32);
+    private static final int DARK_GREEN = Color.rgb(12, 58, 20);
+    private static final int GOLD = Color.rgb(190, 150, 45);
+    private static final int BLUE = Color.rgb(25, 90, 155);
+    private static final int RED = Color.rgb(170, 45, 45);
+    private static final int ORANGE = Color.rgb(190, 105, 20);
+    private static final int PURPLE = Color.rgb(105, 65, 145);
+    private static final int GRAY = Color.rgb(105, 112, 118);
+    private static final int LIGHT = Color.rgb(245, 247, 248);
+    private static final int WHITE = Color.WHITE;
+    private static final int DARK = Color.rgb(30, 35, 40);
+    private static final int BORDER = Color.rgb(215, 220, 224);
 
     private LinearLayout root;
+    private SharedPreferences prefs;
 
-    private final ArrayList<Map<String, String>> personnel =
+    private final ArrayList<LinkedHashMap<String, String>> personnel =
             new ArrayList<>();
+
+    private final LinkedHashMap<String, View> formViews =
+            new LinkedHashMap<>();
+
+    private String editingRecordId = "";
+
+    // =========================================================
+    // 116 FIELD MASTER LIST
+    // =========================================================
+
+    private final String[] FIELDS = {
+
+            "معرّف السجل",
+            "الاسم الثلاثي",
+            "الرتبة",
+            "اللقب",
+            "الفرع",
+            "اسم الأب",
+            "اسم الأم",
+            "الصفة الوظيفية",
+            "الرقم الوطني",
+            "رقم ورقة العائلة",
+            "الرقم الحسابي",
+            "حالة الزواج",
+            "اسم الزوج/ة",
+            "عدد الأبناء",
+            "فصيلة الدم",
+            "قياس البدلة",
+            "قياس الحذاء",
+            "مدينة الإقامة",
+            "رقم الهاتف",
+            "رقم البطاقة الشخصية",
+            "رقم جواز السفر",
+            "الخبرات والسيرة",
+            "اللغات المتقنة",
+            "رقم القرار والتعيين",
+            "تاريخ قرار التعيين",
+            "رقم آخر ترقية",
+            "تاريخ آخر ترقية",
+            "سجل الترقيات السابقة",
+            "تاريخ بداية الانتداب/التكليف",
+            "تاريخ انتهاء الانتداب/التكليف",
+            "الحالة العسكرية الحالية",
+            "الملاحظات والقيود",
+            "تاريخ الميلاد",
+            "العمر (تلقائي)",
+            "مكان الميلاد",
+            "العنوان التفصيلي",
+            "رقم الهاتف البديل",
+            "جهة الاتصال في الطوارئ (اسم)",
+            "رقم الطوارئ",
+            "الوحدة/القطاع",
+            "الدرجة الوظيفية",
+            "الرتبة السابقة",
+            "رقم قرار الترقية",
+            "تاريخ قرار الترقية",
+            "جهة قرار الترقية",
+            "نوع التكليف",
+            "جهة التكليف",
+            "مكان التكليف",
+            "تاريخ بداية التكليف",
+            "تاريخ نهاية التكليف",
+            "رقم قرار التكليف",
+            "حالة التكليف",
+            "نوع الدورة",
+            "اسم الدورة",
+            "الجهة التدريبية",
+            "الدولة",
+            "تاريخ بداية الدورة",
+            "تاريخ نهاية الدورة",
+            "المستوى/التقدير",
+            "رقم الشهادة",
+            "المؤهل",
+            "التخصص",
+            "الجهة التعليمية",
+            "دولة التخرج",
+            "سنة التخرج",
+            "التقدير",
+            "اللغة 1",
+            "مستوى القراءة 1",
+            "مستوى الكتابة 1",
+            "مستوى المحادثة 1",
+            "اللغة 2",
+            "مستوى القراءة 2",
+            "مستوى الكتابة 2",
+            "مستوى المحادثة 2",
+            "نوع الوثيقة",
+            "رقم الوثيقة",
+            "تاريخ الوثيقة",
+            "تاريخ انتهاء الوثيقة",
+            "الجهة المصدرة",
+            "حالة الوثيقة",
+            "حالة التنبيه",
+            "نص التنبيه",
+            "تاريخ التنبيه",
+            "يوم متبقي",
+            "تاريخ الاستحقاق القادم للترقية",
+            "المدة المتبقية للترقية (شهر)",
+            "حالة تنبيه الترقية",
+            "الانوطة والأوسمة",
+            "عدد الترقيات الاستثنائية",
+            "أرقام قرارات الترقية الاستثنائية",
+            "لفت النظر شفاهي (عدد)",
+            "لفت النظر كتابي (عدد)",
+            "إنذار شفاهي (عدد)",
+            "إنذار كتابي (عدد)",
+            "عدد إسقاط رتبة",
+            "صحائف الاتهام (عدد)",
+            "محاضر التحقيق الإداري (عدد)",
+            "الإجازات المرضية (عدد الأيام)",
+            "الجرحى والمصابين (نعم/لا)",
+            "تاريخ الإصابة",
+            "الشهداء (نعم/لا)",
+            "تاريخ الاستشهاد",
+            "رسائل الشكر (عدد)",
+            "نقاط الإيجابيات (التقييم)",
+            "نقاط السلبيات (التقييم)",
+            "النسبة المئوية للتقييم السنوي",
+            "التقدير السنوي (تلقائي)",
+            "مسار/رابط الصورة الشخصية",
+            "مشاركة في خطط أمنية",
+            "قبض على قضايا",
+            "عدد القضايا",
+            "حسن سيرة وسلوك",
+            "السلاح (النوع + الرقم)",
+            "الجهاز اللاسلكي (النوع + الرقم)",
+            "المركبة (النوع + اللوحة)",
+            "معدات أخرى"
+    };
+
+    // =========================================================
+    // EXTRA FIELDS REQUESTED
+    // =========================================================
+
+    private final String[] EXTRA_FIELDS = {
+
+            "تكليف بالمنصب",
+            "منطقة فرع الوسطى",
+            "اسم المصرف",
+            "اسم فرع المصرف",
+            "رقم الحساب",
+            "حالة المرتب",
+            "حالة العمل",
+            "حالة العضوية",
+            "سبب إنهاء العضوية",
+            "حالة العجز/التقييم",
+            "رقم مالي"
+    };
+
+    // =========================================================
+    // OPTIONS
+    // =========================================================
+
+    private final String[] BRANCHES = {
+            "— اختر الفرع —",
+            "الرئاسي",
+            "فرع بنغازي الكبرى",
+            "فرع المرج",
+            "فرع البيضاء",
+            "فرع درنة",
+            "فرع شحات",
+            "فرع القبة",
+            "فرع البطنان",
+            "فرع الوسطى",
+            "فرع الجنوب الشرقي (الكفرة)",
+            "فرع سبها",
+            "فرع براك الشاطئ",
+            "فرع غات",
+            "دوريات صحراوية"
+    };
+
+    private final String[] ASSIGNMENT_TYPES = {
+            "— اختر النوع —",
+            "تعيين",
+            "نقل",
+            "ندب",
+            "ندب وزاري",
+            "ندب وكيل وزارة الداخلية",
+            "تكليف",
+            "عقد"
+    };
+
+    private final String[] POSITION_TYPES = {
+            "— بدون تكليف بالمنصب —",
+            "مدير فرع",
+            "مدير إدارة",
+            "مدير مكتب",
+            "مدير وحدة"
+    };
+
+    private final String[] YES_NO = {
+            "— اختر —",
+            "نعم",
+            "لا"
+    };
+
+    private final String[] SALARY_STATUS = {
+            "— اختر حالة المرتب —",
+            "جاري",
+            "منحة",
+            "موقوف"
+    };
+
+    private final String[] WORK_STATUS = {
+            "— اختر حالة العمل —",
+            "مستمر",
+            "مكلف",
+            "منتدب",
+            "موقوف عن العمل",
+            "منتهي"
+    };
+
+    private final String[] MEMBERSHIP_STATUS = {
+            "— فعال —",
+            "استقالة",
+            "فصل",
+            "انتهاء ندب",
+            "انتهاء تكليف",
+            "انتهاء عقد"
+    };
+
+    private final String[] BLOOD_TYPES = {
+            "— اختر فصيلة الدم —",
+            "A+",
+            "A-",
+            "B+",
+            "B-",
+            "AB+",
+            "AB-",
+            "O+",
+            "O-"
+    };
+
+    private final String[] MARITAL = {
+            "— اختر —",
+            "أعزب",
+            "متزوج",
+            "مطلق",
+            "أرمل"
+    };
+
+    private final String[] MILITARY_STATUS = {
+            "— اختر —",
+            "مستمر",
+            "مكلف",
+            "منتدب",
+            "موقوف",
+            "إجازة",
+            "دورة",
+            "عاجز",
+            "شهيد",
+            "منتهي الخدمة"
+    };
+
+    private final String[] COURSE_TYPES = {
+            "— اختر —",
+            "تدريبية",
+            "تخصصية",
+            "تأهيلية",
+            "ورشة",
+            "أخرى"
+    };
+
+    private final String[] LEVELS = {
+            "— اختر —",
+            "مبتدئ",
+            "متوسط",
+            "جيد",
+            "جيد جدًا",
+            "متقدم",
+            "ممتاز"
+    };
+
+    private final String[] DOC_STATUS = {
+            "— اختر —",
+            "سارية",
+            "منتهية",
+            "موقوفة",
+            "غير متوفرة"
+    };
+
+    private final String[] ALERT_STATUS = {
+            "— اختر —",
+            "لا يوجد",
+            "تنبيه",
+            "عاجل"
+    };
+
+    private final String[] PROMOTION_ALERT = {
+            "— اختر —",
+            "لا يوجد",
+            "قريب",
+            "مستحق",
+            "متأخر"
+    };
+
+    // =========================================================
+    // CREATE
+    // =========================================================
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        prefs = getSharedPreferences(
+                "force_erp_v71",
+                MODE_PRIVATE
+        );
+
+        loadPersonnel();
 
         showLogin();
     }
@@ -52,95 +369,150 @@ public class MainActivity extends Activity {
     private void showLogin() {
 
         LinearLayout page = new LinearLayout(this);
-        page.setOrientation(LinearLayout.VERTICAL);
-        page.setGravity(Gravity.CENTER_HORIZONTAL);
-        page.setPadding(dp(24), dp(35), dp(24), dp(35));
-        page.setBackgroundColor(LIGHT);
-        page.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
 
-        TextView logo = new TextView(this);
-        logo.setText("✦");
-        logo.setTextSize(55);
-        logo.setTextColor(GOLD);
-        logo.setGravity(Gravity.CENTER);
-
-        page.addView(logo, params(-1, 80));
-
-        TextView title = text(
-                "منظومة إدارة القوة العمومية",
-                25,
-                DARK_GREEN,
-                true
+        page.setOrientation(
+                LinearLayout.VERTICAL
         );
-        title.setGravity(Gravity.CENTER);
 
-        page.addView(title, params(-1, 60));
+        page.setGravity(
+                Gravity.CENTER_HORIZONTAL
+        );
 
-        TextView version = text(
-                "V7.1",
-                16,
+        page.setPadding(
+                dp(24),
+                dp(30),
+                dp(24),
+                dp(30)
+        );
+
+        page.setBackgroundColor(LIGHT);
+
+        page.setLayoutDirection(
+                View.LAYOUT_DIRECTION_RTL
+        );
+
+        TextView logo = text(
+                "✦",
+                58,
                 GOLD,
                 true
         );
+
+        logo.setGravity(Gravity.CENTER);
+
+        page.addView(
+                logo,
+                lp(-1, 85)
+        );
+
+        TextView title = text(
+                "منظومة إدارة القوة العمومية",
+                24,
+                DARK_GREEN,
+                true
+        );
+
+        title.setGravity(Gravity.CENTER);
+
+        page.addView(
+                title,
+                lp(-1, 55)
+        );
+
+        TextView version = text(
+                "V7.1",
+                15,
+                GOLD,
+                true
+        );
+
         version.setGravity(Gravity.CENTER);
 
-        page.addView(version, params(-1, 35));
+        page.addView(
+                version,
+                lp(-1, 35)
+        );
 
-        addSpace(page, 20);
+        addSpace(page, 18);
 
-        EditText username = input("اسم المستخدم");
+        EditText username =
+                createEditText("اسم المستخدم");
+
         username.setSingleLine(true);
-        username.setInputType(InputType.TYPE_CLASS_TEXT);
 
-        page.addView(username, marginParams(-1, 58, 0, 10, 0));
+        page.addView(
+                username,
+                margin(-1, 58, 0, 9, 0, 0)
+        );
 
-        EditText password = input("كلمة السر");
+        EditText password =
+                createEditText("كلمة السر");
+
         password.setSingleLine(true);
+
         password.setInputType(
                 InputType.TYPE_CLASS_TEXT |
                 InputType.TYPE_TEXT_VARIATION_PASSWORD
         );
 
-        page.addView(password, marginParams(-1, 58, 0, 15, 0));
-
-        Button login = button(
-                "دخول إلى المنظومة",
-                GREEN
+        page.addView(
+                password,
+                margin(-1, 58, 0, 12, 0, 0)
         );
 
-        page.addView(login, marginParams(-1, 56, 0, 20, 0));
+        Button login =
+                createButton(
+                        "دخول إلى المنظومة",
+                        GREEN
+                );
 
-        TextView info = text(
-                "نظام إداري متكامل لإدارة بيانات القوة العمومية",
+        page.addView(
+                login,
+                margin(-1, 56, 0, 18, 0, 0)
+        );
+
+        TextView note = text(
+                "نظام إداري متكامل لإدارة القوة العمومية",
                 14,
                 GRAY,
                 false
         );
-        info.setGravity(Gravity.CENTER);
 
-        page.addView(info, params(-1, 50));
+        note.setGravity(Gravity.CENTER);
 
-        login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        page.addView(
+                note,
+                lp(-1, 50)
+        );
 
-                String user = username.getText().toString().trim();
-                String pass = password.getText().toString().trim();
+        login.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
 
-                if (user.length() == 0 || pass.length() == 0) {
-                    showMessage(
-                            "بيانات الدخول",
-                            "يرجى إدخال اسم المستخدم وكلمة السر."
-                    );
-                    return;
+                        if (username.getText()
+                                .toString()
+                                .trim()
+                                .length() == 0 ||
+                                password.getText()
+                                        .toString()
+                                        .trim()
+                                        .length() == 0) {
+
+                            message(
+                                    "تسجيل الدخول",
+                                    "أدخل اسم المستخدم وكلمة السر."
+                            );
+
+                            return;
+                        }
+
+                        showDashboard();
+                    }
                 }
+        );
 
-                // الدخول الفعلي إلى الشاشة التالية
-                showDashboard();
-            }
-        });
-
-        // الأهم: وضع واجهة الدخول داخل الـActivity
+        // الحل المباشر لمشكلة الشاشة البيضاء
         setContentView(page);
     }
 
@@ -156,60 +528,66 @@ public class MainActivity extends Activity {
         );
 
         TextView welcome = text(
-                "مرحبًا بك في لوحة القيادة",
-                22,
+                "لوحة القيادة الرئيسية",
+                21,
                 DARK_GREEN,
                 true
         );
 
-        root.addView(welcome, marginParams(-1, 60, 0, 15, 0));
+        root.addView(
+                welcome,
+                margin(-1, 50, 0, 14, 0, 0)
+        );
 
-        LinearLayout stats = new LinearLayout(this);
-        stats.setOrientation(LinearLayout.VERTICAL);
-
-        root.addView(stats, marginParams(-1, -2, 0, 15, 0));
-
-        addStat(
-                stats,
+        addStatCard(
                 "إجمالي المنتسبين",
                 String.valueOf(personnel.size()),
                 GREEN
         );
 
-        addStat(
-                stats,
+        addStatCard(
                 "المكلفون",
-                countStatus("مكلف"),
+                countField(
+                        "الحالة العسكرية الحالية",
+                        "مكلف"
+                ),
                 BLUE
         );
 
-        addStat(
-                stats,
+        addStatCard(
                 "المنتدبون",
-                countStatus("منتدب"),
-                ORANGE
+                countField(
+                        "الحالة العسكرية الحالية",
+                        "منتدب"
+                ),
+                PURPLE
         );
 
-        addStat(
-                stats,
+        addStatCard(
                 "الموقوفون",
-                countStatus("موقوف"),
+                countField(
+                        "الحالة العسكرية الحالية",
+                        "موقوف"
+                ),
                 RED
         );
 
-        addSpace(root, 10);
+        addSpace(root, 12);
 
-        TextView section = text(
+        TextView quick = text(
                 "الوصول السريع",
                 19,
                 DARK,
                 true
         );
 
-        root.addView(section, marginParams(-1, 45, 0, 10, 0));
+        root.addView(
+                quick,
+                margin(-1, 42, 0, 10, 0, 0)
+        );
 
-        addMenuButton(
-                "👤  المنتسبون",
+        menu(
+                "👥  المنتسبون",
                 GREEN,
                 new View.OnClickListener() {
                     @Override
@@ -219,18 +597,18 @@ public class MainActivity extends Activity {
                 }
         );
 
-        addMenuButton(
+        menu(
                 "➕  إضافة منتسب جديد",
                 BLUE,
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        showAddPersonnel();
+                        openPersonnelForm(null);
                     }
                 }
         );
 
-        addMenuButton(
+        menu(
                 "🔎  البحث عن منتسب",
                 DARK_GREEN,
                 new View.OnClickListener() {
@@ -241,7 +619,7 @@ public class MainActivity extends Activity {
                 }
         );
 
-        addMenuButton(
+        menu(
                 "💳  البطاقة المالية",
                 ORANGE,
                 new View.OnClickListener() {
@@ -252,7 +630,18 @@ public class MainActivity extends Activity {
                 }
         );
 
-        addMenuButton(
+        menu(
+                "🔄  الحركة والتكليف",
+                PURPLE,
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showMovement();
+                    }
+                }
+        );
+
+        menu(
                 "📊  التقارير",
                 BLUE,
                 new View.OnClickListener() {
@@ -263,18 +652,7 @@ public class MainActivity extends Activity {
                 }
         );
 
-        addMenuButton(
-                "🔄  الحركة والتكليف",
-                GREEN,
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        showMovement();
-                    }
-                }
-        );
-
-        addMenuButton(
+        menu(
                 "⚙️  الإعدادات",
                 GRAY,
                 new View.OnClickListener() {
@@ -285,107 +663,103 @@ public class MainActivity extends Activity {
                 }
         );
 
-        addSpace(root, 20);
+        addSpace(root, 12);
 
-        Button logout = button(
-                "تسجيل الخروج",
-                RED
-        );
+        Button logout =
+                createButton(
+                        "تسجيل الخروج",
+                        RED
+                );
 
         root.addView(
                 logout,
-                marginParams(-1, 52, 0, 20, 0)
+                margin(-1, 52, 0, 15, 0, 0)
         );
 
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showLogin();
-            }
-        });
+        logout.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showLogin();
+                    }
+                }
+        );
     }
 
     // =========================================================
-    // PERSONNEL
+    // PERSONNEL LIST
     // =========================================================
 
     private void showPersonnel() {
 
         createPage(
                 "المنتسبون",
-                "إدارة سجلات القوة العمومية"
+                "السجلات الفعلية المحفوظة داخل المنظومة"
         );
 
-        Button add = button(
-                "＋ إضافة منتسب جديد",
-                GREEN
-        );
+        Button add =
+                createButton(
+                        "＋ إضافة منتسب جديد",
+                        GREEN
+                );
 
         root.addView(
                 add,
-                marginParams(-1, 54, 0, 15, 0)
+                margin(-1, 55, 0, 12, 0, 0)
         );
 
-        add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showAddPersonnel();
-            }
-        });
+        add.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        openPersonnelForm(null);
+                    }
+                }
+        );
 
-        if (personnel.size() == 0) {
+        if (personnel.isEmpty()) {
 
-            TextView empty = text(
-                    "لا توجد سجلات منتسبين حتى الآن.\n\nاضغط «إضافة منتسب جديد» لإنشاء أول سجل.",
-                    17,
-                    GRAY,
-                    false
-            );
-
-            empty.setGravity(Gravity.CENTER);
-            empty.setPadding(
-                    dp(15),
-                    dp(40),
-                    dp(15),
-                    dp(40)
-            );
-
-            root.addView(
-                    empty,
-                    marginParams(-1, -2, 0, 10, 0)
+            emptyMessage(
+                    "لا توجد سجلات حتى الآن.\n" +
+                    "ابدأ بإضافة أول منتسب."
             );
 
         } else {
 
-            for (int i = 0; i < personnel.size(); i++) {
+            for (int i = 0;
+                 i < personnel.size();
+                 i++) {
 
-                final Map<String, String> record =
+                final LinkedHashMap<String, String> record =
                         personnel.get(i);
-
-                String name = record.get("الاسم الثلاثي");
-
-                if (name == null || name.length() == 0) {
-                    name = "منتسب بدون اسم";
-                }
-
-                Button item = button(
-                        name + "\n" +
-                        safe(record.get("الرتبة")) +
-                        " — " +
-                        safe(record.get("الفرع")),
-                        WHITE
-                );
-
-                item.setTextColor(DARK);
-
-                root.addView(
-                        item,
-                        marginParams(-1, 72, 0, 10, 0)
-                );
 
                 final int index = i;
 
-                item.setOnClickListener(
+                String name =
+                        safe(
+                                record.get(
+                                        "الاسم الثلاثي"
+                                )
+                        );
+
+                Button card =
+                        createButton(
+                                name +
+                                "\n" +
+                                safe(record.get("الرتبة")) +
+                                "  •  " +
+                                safe(record.get("الفرع")),
+                                WHITE
+                        );
+
+                card.setTextColor(DARK);
+
+                root.addView(
+                        card,
+                        margin(-1, 72, 0, 8, 0, 0)
+                );
+
+                card.setOnClickListener(
                         new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -398,104 +772,808 @@ public class MainActivity extends Activity {
             }
         }
 
-        addBackButton();
+        backDashboard();
     }
 
     // =========================================================
-    // ADD PERSONNEL
+    // FULL PERSONNEL FORM
     // =========================================================
 
-    private void showAddPersonnel() {
+    private void openPersonnelForm(
+            LinkedHashMap<String, String> existing) {
+
+        editingRecordId = "";
+
+        formViews.clear();
+
+        if (existing != null) {
+            editingRecordId =
+                    safe(existing.get("معرّف السجل"));
+        }
 
         createPage(
-                "إضافة منتسب جديد",
-                "بيانات المنتسب الأساسية"
+                existing == null
+                        ? "إضافة منتسب جديد"
+                        : "تعديل بيانات المنتسب",
+                "116 خانة أساسية + البيانات الإضافية"
         );
 
-        addField("الاسم الثلاثي", false);
-        addField("الرتبة", false);
-        addField("اللقب", false);
-        addField("الفرع", false);
-        addField("اسم الأب", false);
-        addField("اسم الأم", false);
-        addField("الصفة الوظيفية", false);
-        addField("الرقم الوطني", true);
-        addField("الرقم الحسابي", true);
-        addField("تاريخ الميلاد", false);
-        addField("مدينة الإقامة", false);
-        addField("رقم الهاتف", true);
-
-        addField("تكليف بالمنصب", false);
-        addField("نوع التكليف", false);
-        addField("جهة التكليف", false);
-
-        addField("اسم المصرف", false);
-        addField("اسم فرع المصرف", false);
-        addField("رقم الحساب", true);
-        addField("حالة المرتب", false);
-        addField("حالة العمل", false);
-
-        addField("الحالة العسكرية الحالية", false);
-
-        addSpace(root, 15);
-
-        Button save = button(
-                "حفظ بيانات المنتسب",
-                GREEN
+        addFormSection(
+                "القسم 1 — الهوية والبيانات الشخصية",
+                0,
+                22
         );
+
+        addFormSection(
+                "القسم 2 — التعيين والترقية والتكليف",
+                23,
+                53
+        );
+
+        addFormSection(
+                "القسم 3 — الدورات والتعليم",
+                53,
+                66
+        );
+
+        addFormSection(
+                "القسم 4 — اللغات",
+                66,
+                74
+        );
+
+        addFormSection(
+                "القسم 5 — الوثائق والتنبيهات",
+                74,
+                87
+        );
+
+        addFormSection(
+                "القسم 6 — الأوسمة والجزاءات",
+                87,
+                98
+        );
+
+        addFormSection(
+                "القسم 7 — الإصابات والشهداء والتقييم",
+                98,
+                107
+        );
+
+        addFormSection(
+                "القسم 8 — الصورة والمهام والمعدات",
+                107,
+                116
+        );
+
+        addExtraSection();
+
+        addSpace(root, 10);
+
+        Button save =
+                createButton(
+                        existing == null
+                                ? "حفظ المنتسب"
+                                : "حفظ التعديلات",
+                        GREEN
+                );
 
         root.addView(
                 save,
-                marginParams(-1, 58, 0, 12, 0)
+                margin(-1, 58, 0, 10, 0, 0)
         );
 
-        save.setOnClickListener(new View.OnClickListener() {
+        save.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        savePersonnel(existing);
+                    }
+                }
+        );
 
-            @Override
-            public void onClick(View v) {
+        if (existing != null) {
 
-                // هذه الشاشة في النسخة الأولى تستخدم
-                // الحقول التي يمكن الوصول إليها مباشرة.
-                // سيتم توسيعها بالـ116 خانة في المرحلة التالية.
-
-                EditText name =
-                        findInputByHint("الاسم الثلاثي");
-
-                String personName =
-                        name == null
-                        ? ""
-                        : name.getText().toString().trim();
-
-                if (personName.length() == 0) {
-
-                    showMessage(
-                            "بيانات ناقصة",
-                            "يجب إدخال الاسم الثلاثي أولًا."
+            Button end =
+                    createButton(
+                            "إنهاء / إيقاف سجل العضوية",
+                            RED
                     );
 
-                    return;
-                }
+            root.addView(
+                    end,
+                    margin(-1, 54, 0, 10, 0, 0)
+            );
 
-                Map<String, String> record =
-                        new HashMap<>();
+            end.setOnClickListener(
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            showEndMembership(existing);
+                        }
+                    }
+            );
+        }
 
-                record.put(
-                        "الاسم الثلاثي",
-                        personName
+        backDashboard();
+    }
+
+    private void addFormSection(
+            String title,
+            int from,
+            int to) {
+
+        TextView header =
+                text(
+                        title,
+                        18,
+                        WHITE,
+                        true
                 );
 
-                saveCurrentInputs(record);
+        header.setPadding(
+                dp(15),
+                dp(8),
+                dp(15),
+                dp(8)
+        );
 
-                personnel.add(record);
+        GradientDrawable bg =
+                new GradientDrawable();
 
-                showMessageAndDashboard(
-                        "تم الحفظ",
-                        "تم إنشاء سجل المنتسب بنجاح."
+        bg.setColor(DARK_GREEN);
+        bg.setCornerRadius(dp(12));
+
+        header.setBackground(bg);
+
+        root.addView(
+                header,
+                margin(-1, 46, 0, 8, 0, 0)
+        );
+
+        for (int i = from; i < to; i++) {
+
+            String field = FIELDS[i];
+
+            addDynamicField(
+                    field,
+                    null
+            );
+        }
+    }
+
+    private void addExtraSection() {
+
+        TextView header =
+                text(
+                        "القسم 9 — بيانات إضافية للمنظومة",
+                        18,
+                        WHITE,
+                        true
+                );
+
+        header.setPadding(
+                dp(15),
+                dp(8),
+                dp(15),
+                dp(8)
+        );
+
+        GradientDrawable bg =
+                new GradientDrawable();
+
+        bg.setColor(GOLD);
+        bg.setCornerRadius(dp(12));
+
+        header.setBackground(bg);
+
+        root.addView(
+                header,
+                margin(-1, 46, 0, 8, 0, 0)
+        );
+
+        for (String field : EXTRA_FIELDS) {
+            addDynamicField(field, null);
+        }
+    }
+
+    // =========================================================
+    // DYNAMIC FIELD CREATION
+    // =========================================================
+
+    private void addDynamicField(
+            String field,
+            String value) {
+
+        if (isSpinnerField(field)) {
+
+            Spinner spinner =
+                    createSpinner(
+                            field,
+                            optionsFor(field)
+                    );
+
+            if (value != null) {
+                selectSpinner(
+                        spinner,
+                        value
                 );
             }
-        });
 
-        addBackButton();
+            root.addView(
+                    spinner,
+                    margin(-1, 58, 0, 8, 0, 0)
+            );
+
+            formViews.put(
+                    field,
+                    spinner
+            );
+
+        } else {
+
+            EditText edit =
+                    createEditText(field);
+
+            if (value != null) {
+                edit.setText(value);
+            }
+
+            if (field.equals(
+                    "معرّف السجل")) {
+
+                if (value == null ||
+                        value.length() == 0) {
+
+                    edit.setText(
+                            generateRecordId()
+                    );
+                }
+
+                edit.setEnabled(false);
+            }
+
+            if (field.equals(
+                    "العمر (تلقائي)")) {
+
+                edit.setEnabled(false);
+            }
+
+            if (field.equals(
+                    "التقدير السنوي (تلقائي)")) {
+
+                edit.setEnabled(false);
+            }
+
+            if (isNumberField(field)) {
+                edit.setInputType(
+                        InputType.TYPE_CLASS_NUMBER |
+                        InputType.TYPE_NUMBER_FLAG_DECIMAL
+                );
+            }
+
+            if (isLongText(field)) {
+                edit.setSingleLine(false);
+                edit.setMinHeight(dp(80));
+                edit.setGravity(
+                        Gravity.RIGHT |
+                        Gravity.TOP
+                );
+            }
+
+            root.addView(
+                    edit,
+                    margin(-1,
+                            isLongText(field)
+                                    ? 82
+                                    : 58,
+                            0,
+                            8,
+                            0,
+                            0)
+            );
+
+            formViews.put(
+                    field,
+                    edit
+            );
+        }
+    }
+
+    private boolean isSpinnerField(
+            String field) {
+
+        return field.equals("الفرع") ||
+                field.equals("حالة الزواج") ||
+                field.equals("فصيلة الدم") ||
+                field.equals("الحالة العسكرية الحالية") ||
+                field.equals("الدرجة الوظيفية") ||
+                field.equals("نوع التكليف") ||
+                field.equals("حالة التكليف") ||
+                field.equals("نوع الدورة") ||
+                field.equals("المستوى/التقدير") ||
+                field.equals("حالة الوثيقة") ||
+                field.equals("حالة التنبيه") ||
+                field.equals("حالة تنبيه الترقية") ||
+                field.equals("الجرحى والمصابين (نعم/لا)") ||
+                field.equals("الشهداء (نعم/لا)") ||
+                field.equals("مشاركة في خطط أمنية") ||
+                field.equals("قبض على قضايا") ||
+                field.equals("حسن سيرة وسلوك") ||
+                field.equals("مستوى القراءة 1") ||
+                field.equals("مستوى الكتابة 1") ||
+                field.equals("مستوى المحادثة 1") ||
+                field.equals("مستوى القراءة 2") ||
+                field.equals("مستوى الكتابة 2") ||
+                field.equals("مستوى المحادثة 2") ||
+                field.equals("نوع الوثيقة") ||
+                field.equals("تكليف بالمنصب") ||
+                field.equals("منطقة فرع الوسطى") ||
+                field.equals("حالة المرتب") ||
+                field.equals("حالة العمل") ||
+                field.equals("حالة العضوية") ||
+                field.equals("حالة العجز/التقييم");
+    }
+
+    private String[] optionsFor(
+            String field) {
+
+        if (field.equals("الفرع"))
+            return BRANCHES;
+
+        if (field.equals("حالة الزواج"))
+            return MARITAL;
+
+        if (field.equals("فصيلة الدم"))
+            return BLOOD_TYPES;
+
+        if (field.equals(
+                "الحالة العسكرية الحالية"))
+            return MILITARY_STATUS;
+
+        if (field.equals("الدرجة الوظيفية"))
+            return grades();
+
+        if (field.equals("نوع التكليف"))
+            return ASSIGNMENT_TYPES;
+
+        if (field.equals("حالة التكليف"))
+            return new String[]{
+                    "— اختر —",
+                    "جاري",
+                    "منتهي",
+                    "موقوف",
+                    "ملغى"
+            };
+
+        if (field.equals("نوع الدورة"))
+            return COURSE_TYPES;
+
+        if (field.equals("المستوى/التقدير"))
+            return LEVELS;
+
+        if (field.equals("حالة الوثيقة"))
+            return DOC_STATUS;
+
+        if (field.equals("حالة التنبيه"))
+            return ALERT_STATUS;
+
+        if (field.equals(
+                "حالة تنبيه الترقية"))
+            return PROMOTION_ALERT;
+
+        if (field.equals(
+                "الجرحى والمصابين (نعم/لا)") ||
+                field.equals("الشهداء (نعم/لا)") ||
+                field.equals("مشاركة في خطط أمنية") ||
+                field.equals("قبض على قضايا") ||
+                field.equals("حسن سيرة وسلوك"))
+            return YES_NO;
+
+        if (field.contains("مستوى القراءة") ||
+                field.contains("مستوى الكتابة") ||
+                field.contains("مستوى المحادثة"))
+            return LEVELS;
+
+        if (field.equals("نوع الوثيقة"))
+            return new String[]{
+                    "— اختر —",
+                    "بطاقة شخصية",
+                    "جواز سفر",
+                    "شهادة",
+                    "قرار",
+                    "أخرى"
+            };
+
+        if (field.equals("تكليف بالمنصب"))
+            return POSITION_TYPES;
+
+        if (field.equals("منطقة فرع الوسطى"))
+            return new String[]{
+                    "— غير محدد —",
+                    "إجدابيا",
+                    "سرت"
+            };
+
+        if (field.equals("حالة المرتب"))
+            return SALARY_STATUS;
+
+        if (field.equals("حالة العمل"))
+            return WORK_STATUS;
+
+        if (field.equals("حالة العضوية"))
+            return MEMBERSHIP_STATUS;
+
+        if (field.equals("حالة العجز/التقييم"))
+            return new String[]{
+                    "لا يوجد عجز",
+                    "عجز",
+                    "غير خاضع للتقييم"
+            };
+
+        return YES_NO;
+    }
+
+    private String[] grades() {
+
+        String[] result =
+                new String[15];
+
+        result[0] = "— اختر الدرجة —";
+
+        for (int i = 1; i <= 14; i++) {
+            result[i] =
+                    String.valueOf(i + 2);
+        }
+
+        return result;
+    }
+
+    // =========================================================
+    // SAVE PERSONNEL
+    // =========================================================
+
+    private void savePersonnel(
+            LinkedHashMap<String, String> existing) {
+
+        LinkedHashMap<String, String> record =
+                existing == null
+                        ? new LinkedHashMap<String, String>()
+                        : existing;
+
+        for (String field : FIELDS) {
+
+            View view =
+                    formViews.get(field);
+
+            if (view != null) {
+
+                record.put(
+                        field,
+                        readValue(view)
+                );
+            }
+        }
+
+        for (String field : EXTRA_FIELDS) {
+
+            View view =
+                    formViews.get(field);
+
+            if (view != null) {
+
+                record.put(
+                        field,
+                        readValue(view)
+                );
+            }
+        }
+
+        String name =
+                safe(record.get("الاسم الثلاثي"));
+
+        if (name.equals("—")) {
+
+            message(
+                    "بيانات ناقصة",
+                    "الاسم الثلاثي مطلوب."
+            );
+
+            return;
+        }
+
+        String id =
+                safe(record.get("معرّف السجل"));
+
+        if (id.equals("—")) {
+            id = generateRecordId();
+            record.put("معرّف السجل", id);
+        }
+
+        // العمر تلقائي
+        String birth =
+                safe(record.get("تاريخ الميلاد"));
+
+        if (!birth.equals("—")) {
+
+            String age =
+                    calculateAge(birth);
+
+            record.put(
+                    "العمر (تلقائي)",
+                    age
+            );
+        }
+
+        // التقدير السنوي تلقائي
+        String percentage =
+                safe(
+                        record.get(
+                                "النسبة المئوية للتقييم السنوي"
+                        )
+                );
+
+        if (!percentage.equals("—")) {
+
+            record.put(
+                    "التقدير السنوي (تلقائي)",
+                    calculateAnnualGrade(
+                            percentage
+                    )
+            );
+        }
+
+        // الشهداء والمصابين والعجزة لا يدخلون التقييم
+        String martyr =
+                safe(
+                        record.get(
+                                "الشهداء (نعم/لا)"
+                        )
+                );
+
+        String injured =
+                safe(
+                        record.get(
+                                "الجرحى والمصابين (نعم/لا)"
+                        )
+                );
+
+        String disability =
+                safe(
+                        record.get(
+                                "حالة العجز/التقييم"
+                        )
+                );
+
+        if (martyr.equals("نعم") ||
+                injured.equals("نعم") ||
+                disability.equals("عجز") ||
+                disability.equals("غير خاضع للتقييم")) {
+
+            record.put(
+                    "حالة العجز/التقييم",
+                    "غير خاضع للتقييم"
+            );
+
+            record.put(
+                    "النسبة المئوية للتقييم السنوي",
+                    ""
+            );
+
+            record.put(
+                    "التقدير السنوي (تلقائي)",
+                    ""
+            );
+        }
+
+        if (existing == null) {
+
+            personnel.add(record);
+
+        } else {
+
+            int index =
+                    findRecordIndex(id);
+
+            if (index >= 0) {
+                personnel.set(
+                        index,
+                        record
+                );
+            }
+        }
+
+        savePersonnel();
+
+        messageAndRun(
+                "تم الحفظ",
+                "تم حفظ بيانات المنتسب بنجاح.",
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        showPersonnel();
+                    }
+                }
+        );
+    }
+
+    // =========================================================
+    // PERSONNEL CARD
+    // =========================================================
+
+    private void showPersonnelCard(
+            LinkedHashMap<String, String> record) {
+
+        createPage(
+                "بطاقة المنتسب",
+                safe(record.get("الاسم الثلاثي"))
+        );
+
+        addCardInfo(
+                "الاسم الثلاثي",
+                record.get("الاسم الثلاثي")
+        );
+
+        addCardInfo(
+                "الرتبة",
+                record.get("الرتبة")
+        );
+
+        addCardInfo(
+                "اللقب",
+                record.get("اللقب")
+        );
+
+        addCardInfo(
+                "الفرع",
+                record.get("الفرع")
+        );
+
+        addCardInfo(
+                "الرقم الوطني",
+                record.get("الرقم الوطني")
+        );
+
+        addCardInfo(
+                "الرقم الحسابي",
+                record.get("الرقم الحسابي")
+        );
+
+        addCardInfo(
+                "الحالة العسكرية الحالية",
+                record.get("الحالة العسكرية الحالية")
+        );
+
+        addCardInfo(
+                "تكليف بالمنصب",
+                record.get("تكليف بالمنصب")
+        );
+
+        addCardInfo(
+                "نوع التكليف",
+                record.get("نوع التكليف")
+        );
+
+        addCardInfo(
+                "حالة المرتب",
+                record.get("حالة المرتب")
+        );
+
+        addCardInfo(
+                "اسم المصرف",
+                record.get("اسم المصرف")
+        );
+
+        addCardInfo(
+                "اسم فرع المصرف",
+                record.get("اسم فرع المصرف")
+        );
+
+        addCardInfo(
+                "رقم الحساب",
+                record.get("رقم الحساب")
+        );
+
+        addCardInfo(
+                "العمر",
+                record.get("العمر (تلقائي)")
+        );
+
+        addCardInfo(
+                "حالة العضوية",
+                record.get("حالة العضوية")
+        );
+
+        addSpace(root, 10);
+
+        Button edit =
+                createButton(
+                        "✏️ تعديل بيانات المنتسب",
+                        BLUE
+                );
+
+        root.addView(
+                edit,
+                margin(-1, 54, 0, 9, 0, 0)
+        );
+
+        edit.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        openPersonnelForm(record);
+                    }
+                }
+        );
+
+        Button full =
+                createButton(
+                        "📋 عرض جميع البيانات",
+                        GREEN
+                );
+
+        root.addView(
+                full,
+                margin(-1, 54, 0, 9, 0, 0)
+        );
+
+        full.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showAllRecordData(record);
+                    }
+                }
+        );
+
+        Button financial =
+                createButton(
+                        "💳 البطاقة المالية",
+                        ORANGE
+                );
+
+        root.addView(
+                financial,
+                margin(-1, 54, 0, 9, 0, 0)
+        );
+
+        financial.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showFinancialCard(record);
+                    }
+                }
+        );
+
+        backDashboard();
+    }
+
+    private void showAllRecordData(
+            LinkedHashMap<String, String> record) {
+
+        createPage(
+                "جميع بيانات المنتسب",
+                "116 خانة + البيانات الإضافية"
+        );
+
+        for (String field : FIELDS) {
+
+            addCardInfo(
+                    field,
+                    record.get(field)
+            );
+        }
+
+        for (String field : EXTRA_FIELDS) {
+
+            addCardInfo(
+                    field,
+                    record.get(field)
+            );
+        }
+
+        backDashboard();
     }
 
     // =========================================================
@@ -506,58 +1584,59 @@ public class MainActivity extends Activity {
 
         createPage(
                 "البحث عن منتسب",
-                "بحث بالاسم أو الرقم الوطني أو الرقم الحسابي"
+                "بحث متعدد الحقول"
         );
 
-        EditText search = input(
-                "اكتب اسم المنتسب أو الرقم"
+        EditText query =
+                createEditText(
+                        "الاسم / الرقم الوطني / الرقم الحسابي / الرقم العسكري"
+                );
+
+        root.addView(
+                query,
+                margin(-1, 58, 0, 10, 0, 0)
         );
 
-        search.setSingleLine(true);
+        Button search =
+                createButton(
+                        "🔎 بحث",
+                        GREEN
+                );
 
         root.addView(
                 search,
-                marginParams(-1, 58, 0, 12, 0)
+                margin(-1, 54, 0, 15, 0, 0)
         );
 
-        Button searchButton = button(
-                "بحث",
-                GREEN
-        );
+        LinearLayout results =
+                new LinearLayout(this);
 
-        root.addView(
-                searchButton,
-                marginParams(-1, 52, 0, 20, 0)
-        );
-
-        LinearLayout results = new LinearLayout(this);
         results.setOrientation(
                 LinearLayout.VERTICAL
         );
 
         root.addView(
                 results,
-                marginParams(-1, -2, 0, 10, 0)
+                lp(-1, -2)
         );
 
-        searchButton.setOnClickListener(
+        search.setOnClickListener(
                 new View.OnClickListener() {
-
                     @Override
                     public void onClick(View v) {
 
                         results.removeAllViews();
 
-                        String q = search
-                                .getText()
-                                .toString()
-                                .trim()
-                                .toLowerCase();
+                        String q =
+                                query.getText()
+                                        .toString()
+                                        .trim()
+                                        .toLowerCase();
 
                         if (q.length() == 0) {
-                            showMessage(
+                            message(
                                     "البحث",
-                                    "اكتب كلمة أو رقم للبحث."
+                                    "أدخل كلمة أو رقم."
                             );
                             return;
                         }
@@ -568,32 +1647,26 @@ public class MainActivity extends Activity {
                              i < personnel.size();
                              i++) {
 
-                            Map<String, String> r =
+                            LinkedHashMap<String, String> r =
                                     personnel.get(i);
 
-                            String name =
-                                    safe(r.get("الاسم الثلاثي"))
-                                    .toLowerCase();
-
-                            String national =
-                                    safe(r.get("الرقم الوطني"))
-                                    .toLowerCase();
-
-                            String account =
-                                    safe(r.get("الرقم الحسابي"))
-                                    .toLowerCase();
-
-                            if (name.contains(q)
-                                    || national.contains(q)
-                                    || account.contains(q)) {
+                            if (matches(r, q)) {
 
                                 final int index = i;
 
                                 Button result =
-                                        button(
-                                                safe(r.get(
-                                                        "الاسم الثلاثي"
-                                                )),
+                                        createButton(
+                                                safe(
+                                                        r.get(
+                                                                "الاسم الثلاثي"
+                                                        )
+                                                ) +
+                                                "\n" +
+                                                safe(
+                                                        r.get(
+                                                                "الرقم الوطني"
+                                                        )
+                                                ),
                                                 WHITE
                                         );
 
@@ -601,11 +1674,12 @@ public class MainActivity extends Activity {
 
                                 results.addView(
                                         result,
-                                        marginParams(
+                                        margin(
                                                 -1,
-                                                60,
+                                                70,
                                                 0,
                                                 8,
+                                                0,
                                                 0
                                         )
                                 );
@@ -629,120 +1703,34 @@ public class MainActivity extends Activity {
                         }
 
                         if (found == 0) {
-
-                            TextView no =
-                                    text(
-                                            "لا توجد نتائج مطابقة.",
-                                            16,
-                                            GRAY,
-                                            false
-                                    );
-
-                            no.setGravity(
-                                    Gravity.CENTER
-                            );
-
-                            results.addView(
-                                    no,
-                                    params(-1, 60)
+                            emptyInto(
+                                    results,
+                                    "لا توجد نتائج مطابقة."
                             );
                         }
                     }
                 }
         );
 
-        addBackButton();
+        backDashboard();
     }
 
-    // =========================================================
-    // PERSONNEL CARD
-    // =========================================================
+    private boolean matches(
+            LinkedHashMap<String, String> r,
+            String q) {
 
-    private void showPersonnelCard(
-            Map<String, String> record) {
+        for (String value :
+                r.values()) {
 
-        createPage(
-                "بطاقة المنتسب",
-                "البيانات المسجلة"
-        );
+            if (value != null &&
+                    value.toLowerCase()
+                            .contains(q)) {
 
-        addInfo(
-                "الاسم الثلاثي",
-                safe(record.get("الاسم الثلاثي"))
-        );
+                return true;
+            }
+        }
 
-        addInfo(
-                "الرتبة",
-                safe(record.get("الرتبة"))
-        );
-
-        addInfo(
-                "الفرع",
-                safe(record.get("الفرع"))
-        );
-
-        addInfo(
-                "الرقم الوطني",
-                safe(record.get("الرقم الوطني"))
-        );
-
-        addInfo(
-                "الرقم الحسابي",
-                safe(record.get("الرقم الحسابي"))
-        );
-
-        addInfo(
-                "الحالة العسكرية",
-                safe(record.get(
-                        "الحالة العسكرية الحالية"
-                ))
-        );
-
-        addInfo(
-                "حالة المرتب",
-                safe(record.get("حالة المرتب"))
-        );
-
-        addInfo(
-                "المصرف",
-                safe(record.get("اسم المصرف"))
-        );
-
-        addInfo(
-                "فرع المصرف",
-                safe(record.get("اسم فرع المصرف"))
-        );
-
-        addInfo(
-                "رقم الحساب",
-                safe(record.get("رقم الحساب"))
-        );
-
-        addInfo(
-                "تكليف بالمنصب",
-                safe(record.get("تكليف بالمنصب"))
-        );
-
-        addSpace(root, 15);
-
-        Button close = button(
-                "العودة إلى المنتسبين",
-                GREEN
-        );
-
-        root.addView(
-                close,
-                marginParams(-1, 54, 0, 10, 0)
-        );
-
-        close.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        showPersonnel();
-                    }
-                }
-        );
+        return false;
     }
 
     // =========================================================
@@ -752,60 +1740,128 @@ public class MainActivity extends Activity {
     private void showFinancial() {
 
         createPage(
-                "البطاقة المالية",
-                "بيانات الحساب والمرتب"
+                "البطاقات المالية",
+                "بيانات المرتب والحسابات"
         );
 
-        addInfo(
-                "إجمالي السجلات",
-                String.valueOf(personnel.size())
-        );
+        if (personnel.isEmpty()) {
 
-        addInfo(
-                "حالة المرتب",
-                "جاري / منحة / موقوف"
-        );
+            emptyMessage(
+                    "لا توجد بطاقات مالية بعد."
+            );
 
-        addInfo(
-                "البيانات المالية",
-                "يمكن ربطها بسجل المنتسب عند إدخال بياناته."
-        );
+        } else {
 
-        addBackButton();
+            for (int i = 0;
+                 i < personnel.size();
+                 i++) {
+
+                final int index = i;
+
+                LinkedHashMap<String, String> r =
+                        personnel.get(i);
+
+                Button b =
+                        createButton(
+                                safe(
+                                        r.get(
+                                                "الاسم الثلاثي"
+                                        )
+                                ) +
+                                "\n" +
+                                "المصرف: " +
+                                safe(
+                                        r.get(
+                                                "اسم المصرف"
+                                        )
+                                ),
+                                WHITE
+                        );
+
+                b.setTextColor(DARK);
+
+                root.addView(
+                        b,
+                        margin(
+                                -1,
+                                75,
+                                0,
+                                8,
+                                0,
+                                0
+                        )
+                );
+
+                b.setOnClickListener(
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showFinancialCard(
+                                        personnel.get(index)
+                                );
+                            }
+                        }
+                );
+            }
+        }
+
+        backDashboard();
     }
 
-    // =========================================================
-    // REPORTS
-    // =========================================================
-
-    private void showReports() {
+    private void showFinancialCard(
+            LinkedHashMap<String, String> r) {
 
         createPage(
-                "التقارير",
-                "إحصائيات فعلية من البيانات المسجلة"
+                "البطاقة المالية",
+                safe(r.get("الاسم الثلاثي"))
         );
 
-        addInfo(
-                "إجمالي المنتسبين",
-                String.valueOf(personnel.size())
+        addCardInfo(
+                "الاسم",
+                r.get("الاسم الثلاثي")
         );
 
-        addInfo(
-                "المكلفون",
-                countStatus("مكلف")
+        addCardInfo(
+                "الرقم المالي",
+                r.get("رقم مالي")
         );
 
-        addInfo(
-                "المنتدبون",
-                countStatus("منتدب")
+        addCardInfo(
+                "الرقم الحسابي",
+                r.get("الرقم الحسابي")
         );
 
-        addInfo(
-                "الموقوفون",
-                countStatus("موقوف")
+        addCardInfo(
+                "الرتبة",
+                r.get("الرتبة")
         );
 
-        addBackButton();
+        addCardInfo(
+                "الدرجة الوظيفية",
+                r.get("الدرجة الوظيفية")
+        );
+
+        addCardInfo(
+                "المصرف",
+                r.get("اسم المصرف")
+        );
+
+        addCardInfo(
+                "فرع المصرف",
+                r.get("اسم فرع المصرف")
+        );
+
+        addCardInfo(
+                "رقم الحساب",
+                r.get("رقم الحساب")
+        );
+
+        addCardInfo(
+                "حالة المرتب",
+                r.get("حالة المرتب")
+        );
+
+        backDashboard();
     }
 
     // =========================================================
@@ -816,16 +1872,90 @@ public class MainActivity extends Activity {
 
         createPage(
                 "الحركة والتكليف",
-                "إدارة أنواع الحركة والتكليف"
+                "أنواع الحركة المعتمدة"
         );
 
-        addInfo(
-                "الأنواع المعتمدة",
+        addCardInfo(
+                "الأنواع",
                 "تعيين\nنقل\nندب\nندب وزاري\n" +
                 "ندب وكيل وزارة الداخلية\nتكليف\nعقد"
         );
 
-        addBackButton();
+        addCardInfo(
+                "تكليف بالمنصب",
+                "مدير فرع\nمدير إدارة\nمدير مكتب\nمدير وحدة"
+        );
+
+        addCardInfo(
+                "الفروع",
+                join(BRANCHES)
+        );
+
+        backDashboard();
+    }
+
+    // =========================================================
+    // REPORTS
+    // =========================================================
+
+    private void showReports() {
+
+        createPage(
+                "التقارير والإحصائيات",
+                "أرقام مبنية على السجلات الفعلية"
+        );
+
+        addCardInfo(
+                "إجمالي المنتسبين",
+                String.valueOf(personnel.size())
+        );
+
+        addCardInfo(
+                "المكلفون",
+                countField(
+                        "الحالة العسكرية الحالية",
+                        "مكلف"
+                )
+        );
+
+        addCardInfo(
+                "المنتدبون",
+                countField(
+                        "الحالة العسكرية الحالية",
+                        "منتدب"
+                )
+        );
+
+        addCardInfo(
+                "الموقوفون",
+                countField(
+                        "الحالة العسكرية الحالية",
+                        "موقوف"
+                )
+        );
+
+        addCardInfo(
+                "الشهداء",
+                countExact(
+                        "الشهداء (نعم/لا)",
+                        "نعم"
+                )
+        );
+
+        addCardInfo(
+                "المصابون",
+                countExact(
+                        "الجرحى والمصابين (نعم/لا)",
+                        "نعم"
+                )
+        );
+
+        addCardInfo(
+                "المنتسبون ذوو تكليف بالمنصب",
+                countPositioned()
+        );
+
+        backDashboard();
     }
 
     // =========================================================
@@ -836,29 +1966,132 @@ public class MainActivity extends Activity {
 
         createPage(
                 "الإعدادات",
-                "إعدادات المنظومة"
+                "إعدادات منظومة Force ERP"
         );
 
-        addInfo(
-                "اسم التطبيق",
+        addCardInfo(
+                "اسم المنظومة",
                 "منظومة إدارة القوة العمومية"
         );
 
-        addInfo(
+        addCardInfo(
                 "الإصدار",
                 "V7.1"
         );
 
-        addInfo(
-                "عدد السجلات المحلية",
-                String.valueOf(personnel.size())
+        addCardInfo(
+                "عدد الحقول الأساسية",
+                "116"
         );
 
-        addBackButton();
+        addCardInfo(
+                "الحقول الإضافية",
+                String.valueOf(
+                        EXTRA_FIELDS.length
+                )
+        );
+
+        addCardInfo(
+                "إجمالي الحقول في نموذج المنتسب",
+                String.valueOf(
+                        FIELDS.length +
+                        EXTRA_FIELDS.length
+                )
+        );
+
+        addCardInfo(
+                "السجلات المحفوظة",
+                String.valueOf(
+                        personnel.size()
+                )
+        );
+
+        backDashboard();
     }
 
     // =========================================================
-    // PAGE ENGINE
+    // END MEMBERSHIP
+    // =========================================================
+
+    private void showEndMembership(
+            LinkedHashMap<String, String> record) {
+
+        createPage(
+                "إنهاء / إيقاف العضوية",
+                safe(record.get("الاسم الثلاثي"))
+        );
+
+        Spinner reason =
+                createSpinner(
+                        "سبب إنهاء العضوية",
+                        MEMBERSHIP_STATUS
+                );
+
+        root.addView(
+                reason,
+                margin(-1, 58, 0, 12, 0, 0)
+        );
+
+        Button save =
+                createButton(
+                        "تأكيد حالة العضوية",
+                        RED
+                );
+
+        root.addView(
+                save,
+                margin(-1, 56, 0, 12, 0, 0)
+        );
+
+        save.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        String value =
+                                String.valueOf(
+                                        reason.getSelectedItem()
+                                );
+
+                        if (value.equals("— فعال —")) {
+                            message(
+                                    "الحالة",
+                                    "اختر سبب الإنهاء أو الإيقاف."
+                            );
+                            return;
+                        }
+
+                        record.put(
+                                "حالة العضوية",
+                                value
+                        );
+
+                        record.put(
+                                "سبب إنهاء العضوية",
+                                value
+                        );
+
+                        savePersonnel();
+
+                        messageAndRun(
+                                "تم التحديث",
+                                "تم تحديث حالة العضوية.",
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        showPersonnel();
+                                    }
+                                }
+                        );
+                    }
+                }
+        );
+
+        backDashboard();
+    }
+
+    // =========================================================
+    // PAGE BUILDER
     // =========================================================
 
     private void createPage(
@@ -882,7 +2115,7 @@ public class MainActivity extends Activity {
                 dp(18),
                 dp(18),
                 dp(18),
-                dp(25)
+                dp(28)
         );
 
         root.setLayoutDirection(
@@ -904,48 +2137,6 @@ public class MainActivity extends Activity {
                 LinearLayout.VERTICAL
         );
 
-        header.setGravity(
-                Gravity.CENTER_VERTICAL
-        );
-
-        TextView titleView =
-                text(
-                        title,
-                        24,
-                        WHITE,
-                        true
-                );
-
-        TextView subView =
-                text(
-                        subtitle,
-                        13,
-                        Color.rgb(225, 235, 225),
-                        false
-                );
-
-        header.addView(
-                titleView,
-                params(-1, 42)
-        );
-
-        header.addView(
-                subView,
-                params(-1, 30)
-        );
-
-        GradientDrawable headerBg =
-                new GradientDrawable();
-
-        headerBg.setColor(DARK_GREEN);
-        headerBg.setCornerRadius(
-                dp(18)
-        );
-
-        header.setBackground(
-                headerBg
-        );
-
         header.setPadding(
                 dp(18),
                 dp(8),
@@ -953,24 +2144,51 @@ public class MainActivity extends Activity {
                 dp(8)
         );
 
-        root.addView(
-                header,
-                marginParams(
-                        -1,
-                        82,
-                        0,
-                        20,
-                        0
-                )
+        TextView t =
+                text(
+                        title,
+                        23,
+                        WHITE,
+                        true
+                );
+
+        TextView s =
+                text(
+                        subtitle,
+                        13,
+                        Color.rgb(220, 232, 220),
+                        false
+                );
+
+        header.addView(
+                t,
+                lp(-1, 42)
         );
 
-        // مهم جدًا:
-        // هذه هي الواجهة التي تظهر للمستخدم.
+        header.addView(
+                s,
+                lp(-1, 30)
+        );
+
+        GradientDrawable bg =
+                new GradientDrawable();
+
+        bg.setColor(DARK_GREEN);
+        bg.setCornerRadius(dp(18));
+
+        header.setBackground(bg);
+
+        root.addView(
+                header,
+                margin(-1, 82, 0, 18, 0, 0)
+        );
+
+        // هذا هو المحتوى الحقيقي للـActivity
         setContentView(scroll);
     }
 
     // =========================================================
-    // UI HELPERS
+    // UI
     // =========================================================
 
     private TextView text(
@@ -985,9 +2203,14 @@ public class MainActivity extends Activity {
         t.setText(value);
         t.setTextSize(size);
         t.setTextColor(color);
+
         t.setGravity(
                 Gravity.CENTER_VERTICAL |
                 Gravity.RIGHT
+        );
+
+        t.setLayoutDirection(
+                View.LAYOUT_DIRECTION_RTL
         );
 
         if (bold) {
@@ -997,14 +2220,11 @@ public class MainActivity extends Activity {
             );
         }
 
-        t.setLayoutDirection(
-                View.LAYOUT_DIRECTION_RTL
-        );
-
         return t;
     }
 
-    private EditText input(String hint) {
+    private EditText createEditText(
+            String hint) {
 
         EditText e =
                 new EditText(this);
@@ -1013,39 +2233,69 @@ public class MainActivity extends Activity {
         e.setTextSize(16);
         e.setTextColor(DARK);
         e.setHintTextColor(GRAY);
-        e.setSingleLine(true);
         e.setGravity(
                 Gravity.RIGHT |
                 Gravity.CENTER_VERTICAL
         );
 
         e.setPadding(
-                dp(16),
+                dp(15),
                 0,
-                dp(16),
+                dp(15),
                 0
+        );
+
+        e.setLayoutDirection(
+                View.LAYOUT_DIRECTION_RTL
         );
 
         GradientDrawable bg =
                 new GradientDrawable();
 
         bg.setColor(WHITE);
-        bg.setCornerRadius(
-                dp(14)
-        );
+        bg.setCornerRadius(dp(14));
         bg.setStroke(
                 dp(1),
-                Color.rgb(215, 220, 223)
+                BORDER
         );
 
         e.setBackground(bg);
 
-        e.setTag(hint);
-
         return e;
     }
 
-    private Button button(
+    private Spinner createSpinner(
+            String label,
+            String[] values) {
+
+        Spinner spinner =
+                new Spinner(this);
+
+        ArrayAdapter<String> adapter =
+                new ArrayAdapter<String>(
+                        this,
+                        android.R.layout.simple_spinner_item,
+                        values
+                );
+
+        adapter.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item
+        );
+
+        spinner.setAdapter(adapter);
+
+        spinner.setContentDescription(
+                label
+        );
+
+        spinner.setLayoutDirection(
+                View.LAYOUT_DIRECTION_RTL
+        );
+
+        return spinner;
+    }
+
+    private Button createButton(
             String title,
             int color) {
 
@@ -1055,9 +2305,10 @@ public class MainActivity extends Activity {
         b.setText(title);
         b.setTextSize(16);
         b.setAllCaps(false);
-        b.setGravity(Gravity.CENTER);
         b.setMinHeight(0);
         b.setMinimumHeight(0);
+        b.setGravity(Gravity.CENTER);
+
         b.setPadding(
                 dp(10),
                 0,
@@ -1069,64 +2320,58 @@ public class MainActivity extends Activity {
                 new GradientDrawable();
 
         bg.setColor(color);
-        bg.setCornerRadius(
-                dp(14)
-        );
+        bg.setCornerRadius(dp(14));
 
         b.setBackground(bg);
 
-        if (color == WHITE) {
-            b.setTextColor(DARK);
-        } else {
-            b.setTextColor(WHITE);
-        }
+        b.setTextColor(
+                color == WHITE
+                        ? DARK
+                        : WHITE
+        );
 
         return b;
     }
 
-    private void addMenuButton(
+    private void menu(
             String title,
             int color,
             View.OnClickListener listener) {
 
         Button b =
-                button(title, color);
+                createButton(
+                        title,
+                        color
+                );
 
         root.addView(
                 b,
-                marginParams(
-                        -1,
-                        58,
-                        0,
-                        10,
-                        0
-                )
+                margin(-1, 58, 0, 9, 0, 0)
         );
 
         b.setOnClickListener(listener);
     }
 
-    private void addStat(
-            LinearLayout parent,
+    private void addStatCard(
             String title,
             String value,
             int color) {
 
-        LinearLayout card =
+        LinearLayout box =
                 new LinearLayout(this);
 
-        card.setOrientation(
+        box.setOrientation(
                 LinearLayout.VERTICAL
         );
 
-        card.setGravity(
+        box.setGravity(
                 Gravity.CENTER
         );
 
         TextView number =
                 text(
                         value,
-                        28,
+                        29,
                         color,
                         true
                 );
@@ -1147,43 +2392,35 @@ public class MainActivity extends Activity {
                 Gravity.CENTER
         );
 
-        card.addView(
+        box.addView(
                 number,
-                params(-1, 45)
+                lp(-1, 45)
         );
 
-        card.addView(
+        box.addView(
                 label,
-                params(-1, 35)
+                lp(-1, 34)
         );
 
         GradientDrawable bg =
                 new GradientDrawable();
 
         bg.setColor(WHITE);
-        bg.setCornerRadius(
-                dp(16)
-        );
+        bg.setCornerRadius(dp(16));
         bg.setStroke(
                 dp(1),
-                Color.rgb(225, 228, 230)
+                BORDER
         );
 
-        card.setBackground(bg);
+        box.setBackground(bg);
 
-        parent.addView(
-                card,
-                marginParams(
-                        -1,
-                        90,
-                        0,
-                        8,
-                        0
-                )
+        root.addView(
+                box,
+                margin(-1, 90, 0, 8, 0, 0)
         );
     }
 
-    private void addInfo(
+    private void addCardInfo(
             String label,
             String value) {
 
@@ -1194,17 +2431,24 @@ public class MainActivity extends Activity {
                 LinearLayout.VERTICAL
         );
 
+        box.setPadding(
+                dp(14),
+                dp(8),
+                dp(14),
+                dp(8)
+        );
+
         TextView l =
                 text(
                         label,
-                        13,
+                        12,
                         GRAY,
                         true
                 );
 
         TextView v =
                 text(
-                        value,
+                        safe(value),
                         16,
                         DARK,
                         false
@@ -1212,160 +2456,92 @@ public class MainActivity extends Activity {
 
         box.addView(
                 l,
-                params(-1, 30)
+                lp(-1, 27)
         );
 
         box.addView(
                 v,
-                params(-1, -2)
-        );
-
-        box.setPadding(
-                dp(14),
-                dp(10),
-                dp(14),
-                dp(10)
+                lp(-1, -2)
         );
 
         GradientDrawable bg =
                 new GradientDrawable();
 
         bg.setColor(WHITE);
-        bg.setCornerRadius(
-                dp(14)
-        );
+        bg.setCornerRadius(dp(13));
 
         box.setBackground(bg);
 
         root.addView(
                 box,
-                marginParams(
-                        -1,
-                        -2,
-                        0,
-                        9,
-                        0
-                )
+                margin(-1, -2, 0, 7, 0, 0)
         );
     }
 
-    private void addField(
-            String hint,
-            boolean number) {
+    private void emptyMessage(
+            String message) {
 
-        EditText e =
-                input(hint);
+        TextView t =
+                text(
+                        message,
+                        17,
+                        GRAY,
+                        false
+                );
 
-        if (number) {
-            e.setInputType(
-                    InputType.TYPE_CLASS_NUMBER
-            );
-        }
+        t.setGravity(
+                Gravity.CENTER
+        );
+
+        t.setPadding(
+                dp(10),
+                dp(35),
+                dp(10),
+                dp(35)
+        );
 
         root.addView(
-                e,
-                marginParams(
-                        -1,
-                        58,
-                        0,
-                        9,
-                        0
-                )
+                t,
+                lp(-1, -2)
         );
     }
 
-    private EditText findInputByHint(
-            String hint) {
+    private void emptyInto(
+            LinearLayout parent,
+            String message) {
 
-        if (root == null) {
-            return null;
-        }
+        TextView t =
+                text(
+                        message,
+                        16,
+                        GRAY,
+                        false
+                );
 
-        for (int i = 0;
-             i < root.getChildCount();
-             i++) {
+        t.setGravity(Gravity.CENTER);
 
-            View v =
-                    root.getChildAt(i);
-
-            if (v instanceof EditText) {
-
-                EditText e =
-                        (EditText) v;
-
-                if (hint.equals(
-                        String.valueOf(
-                                e.getTag()
-                        ))) {
-
-                    return e;
-                }
-            }
-        }
-
-        return null;
+        parent.addView(
+                t,
+                lp(-1, 65)
+        );
     }
 
-    private void saveCurrentInputs(
-            Map<String, String> record) {
-
-        if (root == null) {
-            return;
-        }
-
-        for (int i = 0;
-             i < root.getChildCount();
-             i++) {
-
-            View v =
-                    root.getChildAt(i);
-
-            if (v instanceof EditText) {
-
-                EditText e =
-                        (EditText) v;
-
-                Object tag =
-                        e.getTag();
-
-                if (tag != null) {
-
-                    String key =
-                            String.valueOf(tag);
-
-                    record.put(
-                            key,
-                            e.getText()
-                                    .toString()
-                                    .trim()
-                    );
-                }
-            }
-        }
-    }
-
-    private void addBackButton() {
+    private void backDashboard() {
 
         addSpace(root, 10);
 
-        Button back =
-                button(
+        Button b =
+                createButton(
                         "← العودة إلى لوحة القيادة",
                         DARK_GREEN
                 );
 
         root.addView(
-                back,
-                marginParams(
-                        -1,
-                        54,
-                        0,
-                        15,
-                        0
-                )
+                b,
+                margin(-1, 54, 0, 15, 0, 0)
         );
 
-        back.setOnClickListener(
+        b.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -1376,8 +2552,405 @@ public class MainActivity extends Activity {
     }
 
     // =========================================================
-    // UTILITIES
+    // PERSISTENCE
     // =========================================================
+
+    private void savePersonnel() {
+
+        StringBuilder all =
+                new StringBuilder();
+
+        for (int i = 0;
+             i < personnel.size();
+             i++) {
+
+            if (i > 0) {
+                all.append("§§RECORD§§");
+            }
+
+            LinkedHashMap<String, String> record =
+                    personnel.get(i);
+
+            boolean first = true;
+
+            for (Map.Entry<String, String> e :
+                    record.entrySet()) {
+
+                if (!first) {
+                    all.append("§§FIELD§§");
+                }
+
+                first = false;
+
+                all.append(
+                        encode(e.getKey())
+                );
+
+                all.append("§§VALUE§§");
+
+                all.append(
+                        encode(e.getValue())
+                );
+            }
+        }
+
+        prefs.edit()
+                .putString(
+                        "records",
+                        all.toString()
+                )
+                .apply();
+    }
+
+    private void loadPersonnel() {
+
+        personnel.clear();
+
+        String data =
+                prefs.getString(
+                        "records",
+                        ""
+                );
+
+        if (data.length() == 0) {
+            return;
+        }
+
+        String[] records =
+                data.split(
+                        "§§RECORD§§",
+                        -1
+                );
+
+        for (String recordData :
+                records) {
+
+            LinkedHashMap<String, String> record =
+                    new LinkedHashMap<>();
+
+            String[] fields =
+                    recordData.split(
+                            "§§FIELD§§",
+                            -1
+                    );
+
+            for (String field :
+                    fields) {
+
+                String[] pair =
+                        field.split(
+                                "§§VALUE§§",
+                                2
+                        );
+
+                if (pair.length == 2) {
+
+                    record.put(
+                            decode(pair[0]),
+                            decode(pair[1])
+                    );
+                }
+            }
+
+            if (!record.isEmpty()) {
+                personnel.add(record);
+            }
+        }
+    }
+
+    private String encode(String value) {
+
+        if (value == null) {
+            value = "";
+        }
+
+        return android.util.Base64
+                .encodeToString(
+                        value.getBytes(
+                                StandardCharsets.UTF_8
+                        ),
+                        android.util.Base64.NO_WRAP
+                );
+    }
+
+    private String decode(String value) {
+
+        try {
+
+            return new String(
+                    android.util.Base64.decode(
+                            value,
+                            android.util.Base64.DEFAULT
+                    ),
+                    StandardCharsets.UTF_8
+            );
+
+        } catch (Exception e) {
+
+            return "";
+        }
+    }
+
+    // =========================================================
+    // HELPERS
+    // =========================================================
+
+    private String readValue(View view) {
+
+        if (view instanceof EditText) {
+
+            return ((EditText) view)
+                    .getText()
+                    .toString()
+                    .trim();
+        }
+
+        if (view instanceof Spinner) {
+
+            Object value =
+                    ((Spinner) view)
+                            .getSelectedItem();
+
+            return value == null
+                    ? ""
+                    : String.valueOf(value);
+        }
+
+        return "";
+    }
+
+    private void selectSpinner(
+            Spinner spinner,
+            String value) {
+
+        if (value == null) {
+            return;
+        }
+
+        for (int i = 0;
+             i < spinner.getCount();
+             i++) {
+
+            Object item =
+                    spinner.getItemAtPosition(i);
+
+            if (item != null &&
+                    value.equals(
+                            String.valueOf(item)
+                    )) {
+
+                spinner.setSelection(i);
+                return;
+            }
+        }
+    }
+
+    private boolean isNumberField(
+            String field) {
+
+        return field.contains("عدد") ||
+                field.contains("النسبة") ||
+                field.contains("درجة") ||
+                field.contains("رقم") ||
+                field.contains("شهر") ||
+                field.contains("يوم");
+    }
+
+    private boolean isLongText(
+            String field) {
+
+        return field.contains("السيرة") ||
+                field.contains("الملاحظات") ||
+                field.contains("العنوان") ||
+                field.contains("نص التنبيه") ||
+                field.contains("سجل الترقيات") ||
+                field.contains("اللغات المتقنة") ||
+                field.contains("أرقام قرارات") ||
+                field.contains("السلاح") ||
+                field.contains("اللاسلكي") ||
+                field.contains("المركبة") ||
+                field.contains("معدات");
+    }
+
+    private String generateRecordId() {
+
+        return "FR-" +
+                System.currentTimeMillis();
+    }
+
+    private int findRecordIndex(
+            String id) {
+
+        for (int i = 0;
+             i < personnel.size();
+             i++) {
+
+            if (id.equals(
+                    safe(
+                            personnel.get(i)
+                                    .get(
+                                            "معرّف السجل"
+                                    )
+                    )
+            )) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    private String countField(
+            String field,
+            String contains) {
+
+        int count = 0;
+
+        for (LinkedHashMap<String, String> r :
+                personnel) {
+
+            String value =
+                    safe(r.get(field));
+
+            if (value.contains(contains)) {
+                count++;
+            }
+        }
+
+        return String.valueOf(count);
+    }
+
+    private String countExact(
+            String field,
+            String value) {
+
+        int count = 0;
+
+        for (LinkedHashMap<String, String> r :
+                personnel) {
+
+            if (value.equals(
+                    safe(r.get(field))
+            )) {
+                count++;
+            }
+        }
+
+        return String.valueOf(count);
+    }
+
+    private String countPositioned() {
+
+        int count = 0;
+
+        for (LinkedHashMap<String, String> r :
+                personnel) {
+
+            String value =
+                    safe(
+                            r.get(
+                                    "تكليف بالمنصب"
+                            )
+                    );
+
+            if (!value.equals("—") &&
+                    !value.contains("بدون")) {
+
+                count++;
+            }
+        }
+
+        return String.valueOf(count);
+    }
+
+    private String calculateAge(
+            String birth) {
+
+        String[] formats = {
+                "yyyy-MM-dd",
+                "dd/MM/yyyy",
+                "dd-MM-yyyy"
+        };
+
+        for (String format :
+                formats) {
+
+            try {
+
+                SimpleDateFormat sdf =
+                        new SimpleDateFormat(
+                                format,
+                                Locale.US
+                        );
+
+                sdf.setLenient(false);
+
+                java.util.Date date =
+                        sdf.parse(birth);
+
+                Calendar born =
+                        Calendar.getInstance();
+
+                born.setTime(date);
+
+                Calendar now =
+                        Calendar.getInstance();
+
+                int age =
+                        now.get(
+                                Calendar.YEAR
+                        ) -
+                        born.get(
+                                Calendar.YEAR
+                        );
+
+                if (now.get(
+                        Calendar.DAY_OF_YEAR
+                ) <
+                        born.get(
+                                Calendar.DAY_OF_YEAR
+                        )) {
+
+                    age--;
+                }
+
+                if (age < 0) {
+                    return "";
+                }
+
+                return String.valueOf(age);
+
+            } catch (ParseException ignored) {
+            }
+        }
+
+        return "";
+    }
+
+    private String calculateAnnualGrade(
+            String percentage) {
+
+        try {
+
+            double p =
+                    Double.parseDouble(
+                            percentage
+                                    .replace("%", "")
+                                    .trim()
+                    );
+
+            if (p >= 90) return "ممتاز";
+            if (p >= 80) return "جيد جدًا";
+            if (p >= 70) return "جيد";
+            if (p >= 60) return "مقبول";
+
+            return "ضعيف";
+
+        } catch (Exception e) {
+
+            return "";
+        }
+    }
 
     private String safe(String value) {
 
@@ -1390,36 +2963,37 @@ public class MainActivity extends Activity {
         return value;
     }
 
-    private String countStatus(
-            String status) {
+    private String join(
+            String[] values) {
 
-        int count = 0;
+        StringBuilder b =
+                new StringBuilder();
 
-        for (Map<String, String> r :
-                personnel) {
+        for (int i = 1;
+             i < values.length;
+             i++) {
 
-            String current =
-                    safe(
-                            r.get(
-                                    "الحالة العسكرية الحالية"
-                            )
-                    );
-
-            if (current.contains(status)) {
-                count++;
+            if (b.length() > 0) {
+                b.append("\n");
             }
+
+            b.append(values[i]);
         }
 
-        return String.valueOf(count);
+        return b.toString();
     }
 
-    private void showMessage(
+    // =========================================================
+    // DIALOGS
+    // =========================================================
+
+    private void message(
             String title,
-            String message) {
+            String body) {
 
         new AlertDialog.Builder(this)
                 .setTitle(title)
-                .setMessage(message)
+                .setMessage(body)
                 .setPositiveButton(
                         "حسنًا",
                         null
@@ -1427,80 +3001,91 @@ public class MainActivity extends Activity {
                 .show();
     }
 
-    private void showMessageAndDashboard(
+    private void messageAndRun(
             String title,
-            String message) {
+            String body,
+            final Runnable action) {
 
         new AlertDialog.Builder(this)
                 .setTitle(title)
-                .setMessage(message)
+                .setMessage(body)
                 .setPositiveButton(
                         "متابعة",
-                        (dialog, which) ->
-                                showDashboard()
+                        (dialog, which) -> action.run()
                 )
                 .show();
+    }
+
+    // =========================================================
+    // LAYOUT HELPERS
+    // =========================================================
+
+    private LinearLayout.LayoutParams lp(
+            int width,
+            int height) {
+
+        int w =
+                width == -1
+                        ? ViewGroup.LayoutParams.MATCH_PARENT
+                        : width == -2
+                        ? ViewGroup.LayoutParams.WRAP_CONTENT
+                        : dp(width);
+
+        int h =
+                height == -1
+                        ? ViewGroup.LayoutParams.MATCH_PARENT
+                        : height == -2
+                        ? ViewGroup.LayoutParams.WRAP_CONTENT
+                        : dp(height);
+
+        return new LinearLayout.LayoutParams(
+                w,
+                h
+        );
+    }
+
+    private LinearLayout.LayoutParams margin(
+            int width,
+            int height,
+            int left,
+            int top,
+            int right,
+            int bottom) {
+
+        LinearLayout.LayoutParams p =
+                lp(width, height);
+
+        p.setMargins(
+                dp(left),
+                dp(top),
+                dp(right),
+                dp(bottom)
+        );
+
+        return p;
     }
 
     private void addSpace(
             LinearLayout parent,
             int height) {
 
-        View space =
+        View v =
                 new View(this);
 
         parent.addView(
-                space,
-                params(-1, height)
+                v,
+                lp(-1, height)
         );
     }
 
     private int dp(int value) {
 
-        return (int)
-                (value *
+        return (int) (
+                value *
                 getResources()
                         .getDisplayMetrics()
                         .density
-                + 0.5f);
-    }
-
-    private LinearLayout.LayoutParams
-    params(int width, int height) {
-
-        return new LinearLayout.LayoutParams(
-                width == -1
-                        ? ViewGroup.LayoutParams.MATCH_PARENT
-                        : width == -2
-                        ? ViewGroup.LayoutParams.WRAP_CONTENT
-                        : dp(width),
-
-                height == -1
-                        ? ViewGroup.LayoutParams.MATCH_PARENT
-                        : height == -2
-                        ? ViewGroup.LayoutParams.WRAP_CONTENT
-                        : dp(height)
+                        + 0.5f
         );
-    }
-
-    private LinearLayout.LayoutParams
-    marginParams(
-            int width,
-            int height,
-            int left,
-            int top,
-            int right) {
-
-        LinearLayout.LayoutParams p =
-                params(width, height);
-
-        p.setMargins(
-                dp(left),
-                dp(top),
-                dp(right),
-                dp(0)
-        );
-
-        return p;
     }
 }
