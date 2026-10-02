@@ -3,84 +3,95 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4F6F5">
+    android:background="#F3F5F4"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="14dp"
+        android:layoutDirection="rtl">
 
-        <!-- رأس النظام -->
+        <!-- ==================== HEADER ==================== -->
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingBottom="14dp">
+            android:orientation="vertical"
+            android:padding="18dp"
+            android:background="#174D2A"
+            android:elevation="8dp">
 
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="رئاسة قوة العمومية"
-                android:textColor="#174D2A"
-                android:textSize="23sp"
-                android:textStyle="bold"/>
+                android:textColor="#FFFFFF"
+                android:textSize="25sp"
+                android:textStyle="bold"
+                android:gravity="center"/>
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="🔔"
-                android:textSize="25sp"
-                android:padding="8dp"/>
+                android:text="منظومة إدارة القوة العمومية"
+                android:textColor="#E8F2EA"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:paddingTop="5dp"/>
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="⚙"
-                android:textSize="25sp"
-                android:padding="8dp"/>
+                android:text="V7.1 • لوحة القيادة الرئيسية"
+                android:textColor="#D4E6D9"
+                android:textSize="13sp"
+                android:gravity="center"
+                android:paddingTop="3dp"/>
 
         </LinearLayout>
+
+
+        <!-- ==================== SUMMARY ==================== -->
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="منظومة إدارة القوة العمومية V7.1"
-            android:textColor="#666666"
-            android:textSize="15sp"
-            android:gravity="center"
-            android:paddingBottom="18dp"/>
+            android:text="ملخص القوة"
+            android:textColor="#202522"
+            android:textSize="21sp"
+            android:textStyle="bold"
+            android:paddingTop="20dp"
+            android:paddingBottom="10dp"/>
 
-
-        <!-- إجمالي القوة -->
 
         <LinearLayout
+            android:id="@+id/cardTotalForce"
             android:layout_width="match_parent"
             android:layout_height="210dp"
             android:orientation="vertical"
             android:gravity="center"
             android:background="#FFFFFF"
-            android:elevation="7dp"
+            android:elevation="8dp"
             android:padding="15dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="إجمالي القوة"
-                android:textColor="#555555"
+                android:textColor="#666666"
                 android:textSize="18sp"/>
 
             <TextView
+                android:id="@+id/txtTotalForce"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="1,250"
                 android:textColor="#174D2A"
-                android:textSize="48sp"
+                android:textSize="50sp"
                 android:textStyle="bold"
-                android:paddingTop="5dp"/>
+                android:paddingTop="4dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -89,47 +100,55 @@
                 android:textColor="#777777"
                 android:textSize="15sp"/>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="100% من القوة المسجلة"
+                android:textColor="#174D2A"
+                android:textSize="13sp"
+                android:paddingTop="8dp"/>
+
         </LinearLayout>
 
 
-        <!-- عنوان التوزيع -->
+        <!-- ==================== DISTRIBUTION ==================== -->
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="توزيع القوة"
-            android:textColor="#222222"
+            android:text="التوزيع حسب الفئة"
+            android:textColor="#202522"
             android:textSize="21sp"
             android:textStyle="bold"
-            android:paddingTop="24dp"
-            android:paddingBottom="12dp"/>
+            android:paddingTop="22dp"
+            android:paddingBottom="10dp"/>
 
 
-        <!-- الدوائر -->
+        <!-- Officers + NCO -->
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:orientation="horizontal">
 
             <LinearLayout
+                android:id="@+id/cardOfficers"
                 android:layout_width="0dp"
-                android:layout_height="145dp"
+                android:layout_height="155dp"
                 android:layout_weight="1"
+                android:layout_margin="4dp"
                 android:orientation="vertical"
                 android:gravity="center"
                 android:background="#FFFFFF"
-                android:elevation="5dp"
-                android:layout_margin="5dp">
+                android:elevation="6dp">
 
                 <TextView
-                    android:layout_width="85dp"
-                    android:layout_height="85dp"
+                    android:layout_width="82dp"
+                    android:layout_height="82dp"
                     android:gravity="center"
                     android:text="180"
                     android:textColor="#174D2A"
-                    android:textSize="25sp"
+                    android:textSize="26sp"
                     android:textStyle="bold"
                     android:background="#DCEFE2"/>
 
@@ -137,30 +156,32 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="الضباط"
+                    android:textColor="#222222"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    android:paddingTop="7dp"/>
+                    android:paddingTop="8dp"/>
 
             </LinearLayout>
 
 
             <LinearLayout
+                android:id="@+id/cardNcos"
                 android:layout_width="0dp"
-                android:layout_height="145dp"
+                android:layout_height="155dp"
                 android:layout_weight="1"
+                android:layout_margin="4dp"
                 android:orientation="vertical"
                 android:gravity="center"
                 android:background="#FFFFFF"
-                android:elevation="5dp"
-                android:layout_margin="5dp">
+                android:elevation="6dp">
 
                 <TextView
-                    android:layout_width="85dp"
-                    android:layout_height="85dp"
+                    android:layout_width="82dp"
+                    android:layout_height="82dp"
                     android:gravity="center"
                     android:text="420"
                     android:textColor="#315A87"
-                    android:textSize="25sp"
+                    android:textSize="26sp"
                     android:textStyle="bold"
                     android:background="#DDE8F5"/>
 
@@ -168,38 +189,41 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="ضباط الصف"
+                    android:textColor="#222222"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    android:paddingTop="7dp"/>
+                    android:paddingTop="8dp"/>
 
             </LinearLayout>
 
         </LinearLayout>
 
 
+        <!-- Personnel + Employees -->
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:orientation="horizontal">
 
             <LinearLayout
+                android:id="@+id/cardPersonnel"
                 android:layout_width="0dp"
-                android:layout_height="145dp"
+                android:layout_height="155dp"
                 android:layout_weight="1"
+                android:layout_margin="4dp"
                 android:orientation="vertical"
                 android:gravity="center"
                 android:background="#FFFFFF"
-                android:elevation="5dp"
-                android:layout_margin="5dp">
+                android:elevation="6dp">
 
                 <TextView
-                    android:layout_width="85dp"
-                    android:layout_height="85dp"
+                    android:layout_width="82dp"
+                    android:layout_height="82dp"
                     android:gravity="center"
                     android:text="530"
                     android:textColor="#8A5A18"
-                    android:textSize="25sp"
+                    android:textSize="26sp"
                     android:textStyle="bold"
                     android:background="#F5E8CB"/>
 
@@ -207,30 +231,32 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="الأفراد"
+                    android:textColor="#222222"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    android:paddingTop="7dp"/>
+                    android:paddingTop="8dp"/>
 
             </LinearLayout>
 
 
             <LinearLayout
+                android:id="@+id/cardEmployees"
                 android:layout_width="0dp"
-                android:layout_height="145dp"
+                android:layout_height="155dp"
                 android:layout_weight="1"
+                android:layout_margin="4dp"
                 android:orientation="vertical"
                 android:gravity="center"
                 android:background="#FFFFFF"
-                android:elevation="5dp"
-                android:layout_margin="5dp">
+                android:elevation="6dp">
 
                 <TextView
-                    android:layout_width="85dp"
-                    android:layout_height="85dp"
+                    android:layout_width="82dp"
+                    android:layout_height="82dp"
                     android:gravity="center"
                     android:text="120"
                     android:textColor="#654A7A"
-                    android:textSize="25sp"
+                    android:textSize="26sp"
                     android:textStyle="bold"
                     android:background="#E9DFF0"/>
 
@@ -238,69 +264,399 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="الموظفون"
+                    android:textColor="#222222"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    android:paddingTop="7dp"/>
+                    android:paddingTop="8dp"/>
 
             </LinearLayout>
 
         </LinearLayout>
 
 
-        <!-- الوصول السريع -->
+        <!-- ==================== STATUS ==================== -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="الموقف الحالي"
+            android:textColor="#202522"
+            android:textSize="21sp"
+            android:textStyle="bold"
+            android:paddingTop="24dp"
+            android:paddingBottom="10dp"/>
+
+
+        <!-- مستمرون -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="#FFFFFF"
+            android:padding="8dp"
+            android:layout_marginBottom="6dp"
+            android:elevation="3dp">
+
+            <TextView
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:text="مستمرون"
+                android:textColor="#333333"
+                android:textSize="15sp"
+                android:textStyle="bold"/>
+
+            <ProgressBar
+                android:layout_width="0dp"
+                android:layout_height="12dp"
+                android:layout_weight="1"
+                android:progress="82"
+                android:max="100"
+                style="?android:attr/progressBarStyleHorizontal"/>
+
+            <TextView
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:text="82%"
+                android:gravity="center"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+
+        <!-- مكلفون -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="#FFFFFF"
+            android:padding="8dp"
+            android:layout_marginBottom="6dp"
+            android:elevation="3dp">
+
+            <TextView
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:text="مكلفون"
+                android:textColor="#333333"
+                android:textSize="15sp"
+                android:textStyle="bold"/>
+
+            <ProgressBar
+                android:layout_width="0dp"
+                android:layout_height="12dp"
+                android:layout_weight="1"
+                android:progress="8"
+                android:max="100"
+                style="?android:attr/progressBarStyleHorizontal"/>
+
+            <TextView
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:text="8%"
+                android:gravity="center"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+
+        <!-- منتدبون -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="#FFFFFF"
+            android:padding="8dp"
+            android:layout_marginBottom="6dp"
+            android:elevation="3dp">
+
+            <TextView
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:text="منتدبون"
+                android:textColor="#333333"
+                android:textSize="15sp"
+                android:textStyle="bold"/>
+
+            <ProgressBar
+                android:layout_width="0dp"
+                android:layout_height="12dp"
+                android:layout_weight="1"
+                android:progress="4"
+                android:max="100"
+                style="?android:attr/progressBarStyleHorizontal"/>
+
+            <TextView
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:text="4%"
+                android:gravity="center"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+
+        <!-- موقوفون -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="#FFFFFF"
+            android:padding="8dp"
+            android:layout_marginBottom="6dp"
+            android:elevation="3dp">
+
+            <TextView
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:text="موقوفون"
+                android:textColor="#333333"
+                android:textSize="15sp"
+                android:textStyle="bold"/>
+
+            <ProgressBar
+                android:layout_width="0dp"
+                android:layout_height="12dp"
+                android:layout_weight="1"
+                android:progress="2"
+                android:max="100"
+                style="?android:attr/progressBarStyleHorizontal"/>
+
+            <TextView
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:text="2%"
+                android:gravity="center"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+
+        <!-- إجازة -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="#FFFFFF"
+            android:padding="8dp"
+            android:layout_marginBottom="6dp"
+            android:elevation="3dp">
+
+            <TextView
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:text="إجازة"
+                android:textColor="#333333"
+                android:textSize="15sp"
+                android:textStyle="bold"/>
+
+            <ProgressBar
+                android:layout_width="0dp"
+                android:layout_height="12dp"
+                android:layout_weight="1"
+                android:progress="3"
+                android:max="100"
+                style="?android:attr/progressBarStyleHorizontal"/>
+
+            <TextView
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:text="3%"
+                android:gravity="center"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+
+        <!-- دورات -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="#FFFFFF"
+            android:padding="8dp"
+            android:layout_marginBottom="6dp"
+            android:elevation="3dp">
+
+            <TextView
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:text="دورات"
+                android:textColor="#333333"
+                android:textSize="15sp"
+                android:textStyle="bold"/>
+
+            <ProgressBar
+                android:layout_width="0dp"
+                android:layout_height="12dp"
+                android:layout_weight="1"
+                android:progress="6"
+                android:max="100"
+                style="?android:attr/progressBarStyleHorizontal"/>
+
+            <TextView
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:text="6%"
+                android:gravity="center"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+
+        <!-- ==================== STRUCTURE ==================== -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="الهيكل الإداري"
+            android:textColor="#202522"
+            android:textSize="21sp"
+            android:textStyle="bold"
+            android:paddingTop="24dp"
+            android:paddingBottom="10dp"/>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="12dp"
+            android:background="#FFFFFF"
+            android:elevation="6dp">
+
+            <TextView
+                android:layout_width="230dp"
+                android:layout_height="52dp"
+                android:text="قيادة قوة العمومية"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:background="#174D2A"/>
+
+            <TextView
+                android:layout_width="190dp"
+                android:layout_height="45dp"
+                android:text="الإدارات"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:background="#315A87"
+                android:layout_marginTop="6dp"/>
+
+            <TextView
+                android:layout_width="150dp"
+                android:layout_height="42dp"
+                android:text="المكاتب"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:background="#8A5A18"
+                android:layout_marginTop="6dp"/>
+
+            <TextView
+                android:layout_width="110dp"
+                android:layout_height="40dp"
+                android:text="الوحدات"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:background="#654A7A"
+                android:layout_marginTop="6dp"/>
+
+            <TextView
+                android:layout_width="80dp"
+                android:layout_height="38dp"
+                android:text="منتسبون"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:background="#527A5F"
+                android:layout_marginTop="6dp"/>
+
+        </LinearLayout>
+
+
+        <!-- ==================== QUICK ACCESS ==================== -->
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="الوصول السريع"
-            android:textColor="#222222"
+            android:textColor="#202522"
             android:textSize="21sp"
             android:textStyle="bold"
-            android:paddingTop="25dp"
+            android:paddingTop="24dp"
             android:paddingBottom="10dp"/>
 
 
         <Button
+            android:id="@+id/btnPersonnel"
             android:layout_width="match_parent"
             android:layout_height="58dp"
-            android:text="👥  المنتسبون"
+            android:text="👥   المنتسبون"
             android:textSize="17sp"/>
 
         <Button
+            android:id="@+id/btnSearch"
             android:layout_width="match_parent"
             android:layout_height="58dp"
-            android:text="🔎  البحث عن منتسب"
+            android:text="🔎   البحث عن منتسب"
             android:textSize="17sp"/>
 
         <Button
+            android:id="@+id/btnReports"
             android:layout_width="match_parent"
             android:layout_height="58dp"
-            android:text="📊  التقارير والإحصائيات"
+            android:text="📊   التقارير والإحصائيات"
             android:textSize="17sp"/>
 
         <Button
+            android:id="@+id/btnFinancial"
             android:layout_width="match_parent"
             android:layout_height="58dp"
-            android:text="💰  البطاقة المالية"
+            android:text="💰   البطاقة المالية"
             android:textSize="17sp"/>
 
         <Button
+            android:id="@+id/btnCourses"
             android:layout_width="match_parent"
             android:layout_height="58dp"
-            android:text="🎓  الدورات والمؤهلات"
+            android:text="🎓   الدورات والمؤهلات"
             android:textSize="17sp"/>
 
         <Button
+            android:id="@+id/btnMovement"
             android:layout_width="match_parent"
             android:layout_height="58dp"
-            android:text="🔄  الحركة والتنقلات"
+            android:text="🔄   الحركة والتنقلات"
             android:textSize="17sp"/>
 
         <Button
+            android:id="@+id/btnSettings"
             android:layout_width="match_parent"
             android:layout_height="58dp"
-            android:text="⚙  الإعدادات"
+            android:text="⚙   الإعدادات"
             android:textSize="17sp"/>
+
+
+        <!-- ==================== FOOTER ==================== -->
 
         <TextView
             android:layout_width="match_parent"
@@ -310,7 +666,7 @@
             android:textSize="12sp"
             android:gravity="center"
             android:paddingTop="25dp"
-            android:paddingBottom="10dp"/>
+            android:paddingBottom="20dp"/>
 
     </LinearLayout>
 
