@@ -3,44 +3,35 @@ package ly.moi.forceerp;
 import android.app.Activity;
 import android.os.Bundle;
 import android.graphics.Color;
-import android.text.InputType;
+import android.graphics.Typeface;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
+    private int green = Color.rgb(27, 94, 32);
+    private int dark = Color.rgb(35, 35, 35);
+    private int gray = Color.rgb(100, 100, 100);
+    private int light = Color.rgb(245, 247, 246);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         showLogin();
     }
 
     private void showLogin() {
 
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setGravity(Gravity.CENTER);
-        layout.setPadding(40, 40, 40, 40);
-        layout.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        LinearLayout layout = baseLayout();
 
-        TextView title = new TextView(this);
-        title.setText("منظومة إدارة القوة العمومية");
-        title.setTextSize(24);
-        title.setTextColor(Color.DKGRAY);
-        title.setGravity(Gravity.CENTER);
-        title.setPadding(0, 0, 0, 30);
-
-        TextView version = new TextView(this);
-        version.setText("V7.1");
-        version.setTextSize(18);
-        version.setGravity(Gravity.CENTER);
-        version.setPadding(0, 0, 0, 30);
+        TextView title = title("منظومة إدارة القوة العمومية");
+        TextView version = centerText("V7.1", 18, green);
 
         EditText username = new EditText(this);
         username.setHint("اسم المستخدم");
@@ -50,34 +41,30 @@ public class MainActivity extends Activity {
         password.setHint("كلمة المرور");
         password.setSingleLine(true);
         password.setInputType(
-                InputType.TYPE_CLASS_TEXT |
-                InputType.TYPE_TEXT_VARIATION_PASSWORD
+                android.text.InputType.TYPE_CLASS_TEXT |
+                android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
         );
 
-        Button loginButton = new Button(this);
-        loginButton.setText("دخول");
+        Button login = button("دخول");
 
         layout.addView(title);
         layout.addView(version);
         layout.addView(username);
         layout.addView(password);
-        layout.addView(loginButton);
+        layout.addView(login);
 
         setContentView(layout);
 
-        loginButton.setOnClickListener(v -> {
+        login.setOnClickListener(v -> {
 
             String user = username.getText().toString().trim();
             String pass = password.getText().toString();
 
             if (user.equals("admin") && pass.equals("Admin2026")) {
-
                 showDashboard();
-
             } else {
-
                 Toast.makeText(
-                        MainActivity.this,
+                        this,
                         "اسم المستخدم أو كلمة المرور غير صحيحة",
                         Toast.LENGTH_SHORT
                 ).show();
@@ -87,206 +74,117 @@ public class MainActivity extends Activity {
 
     private void showDashboard() {
 
-        setContentView(R.layout.activity_main);
+        LinearLayout layout = baseLayout();
 
-        setupDashboardButtons();
-    }
+        TextView head = title("لوحة القيادة الاستراتيجية");
 
-    private void setupDashboardButtons() {
-
-        Button personnel = findViewById(R.id.btnPersonnel);
-        Button search = findViewById(R.id.btnSearch);
-        Button reports = findViewById(R.id.btnReports);
-        Button financial = findViewById(R.id.btnFinancial);
-        Button courses = findViewById(R.id.btnCourses);
-        Button movement = findViewById(R.id.btnMovement);
-        Button settings = findViewById(R.id.btnSettings);
-
-        personnel.setOnClickListener(v -> showPersonnelScreen());
-
-        search.setOnClickListener(v -> showSearchScreen());
-
-        reports.setOnClickListener(v ->
-                showMessage("التقارير والإحصائيات - سيتم ربطها بالبيانات الفعلية")
+        TextView subtitle = centerText(
+                "رئاسة جهاز مكافحة الهجرة غير الشرعية\nمنظومة إدارة القوة العمومية V7.1",
+                17,
+                green
         );
 
-        financial.setOnClickListener(v ->
-                showMessage("البطاقة المالية - سيتم ربطها بملف المنتسب")
-        );
+        TextView total = cardNumber("إجمالي القوة", "1,250");
 
-        courses.setOnClickListener(v ->
-                showMessage("الدورات والمؤهلات - سيتم ربطها ببيانات المنتسب")
-        );
+        Button personnel = button("👥 المنتسبون");
+        Button search = button("🔎 البحث عن منتسب");
+        Button reports = button("📊 التقارير والإحصائيات");
+        Button financial = button("💰 البطاقة المالية");
+        Button courses = button("🎓 الدورات والمؤهلات");
+        Button movement = button("🔄 الحركة والتنقلات");
+        Button settings = button("⚙ الإعدادات");
 
-        movement.setOnClickListener(v ->
-                showMessage("الحركة والتنقلات - سيتم ربطها بقرارات النقل والندب والتكليف")
-        );
+        layout.addView(head);
+        layout.addView(subtitle);
+        layout.addView(total);
 
-        settings.setOnClickListener(v ->
-                showMessage("الإعدادات")
-        );
-    }
-
-    private void showPersonnelScreen() {
-
-        LinearLayout layout = createScreenLayout();
-
-        TextView title = createTitle("👥 المنتسبون");
-
-        TextView info = new TextView(this);
-        info.setText(
-                "إدارة بيانات المنتسبين\n\n" +
-                "سيتم هنا التعامل مع كامل بيانات المنتسب البالغ عددها 116 خانة."
-        );
-        info.setTextSize(17);
-        info.setTextColor(Color.DKGRAY);
-        info.setGravity(Gravity.CENTER);
-        info.setPadding(10, 20, 10, 20);
-
-        Button add = new Button(this);
-        add.setText("➕ إضافة منتسب جديد");
-        add.setTextSize(17);
-
-        Button search = new Button(this);
-        search.setText("🔎 البحث عن منتسب");
-        search.setTextSize(17);
-
-        Button back = new Button(this);
-        back.setText("↩ العودة إلى لوحة القيادة");
-
-        layout.addView(title);
-        layout.addView(info);
-        layout.addView(add);
+        layout.addView(personnel);
         layout.addView(search);
-        layout.addView(back);
+        layout.addView(reports);
+        layout.addView(financial);
+        layout.addView(courses);
+        layout.addView(movement);
+        layout.addView(settings);
 
         setContentView(layout);
 
-        add.setOnClickListener(v ->
-                showMessage("شاشة إضافة المنتسب - ستحتوي على جميع الـ116 خانة")
-        );
-
-        search.setOnClickListener(v -> showSearchScreen());
-
-        back.setOnClickListener(v -> showDashboard());
+        personnel.setOnClickListener(v -> showPersonnelCard());
+        search.setOnClickListener(v -> showSearch());
+        reports.setOnClickListener(v -> message("التقارير والإحصائيات"));
+        financial.setOnClickListener(v -> message("البطاقة المالية"));
+        courses.setOnClickListener(v -> message("الدورات والمؤهلات"));
+        movement.setOnClickListener(v -> message("الحركة والتنقلات"));
+        settings.setOnClickListener(v -> message("الإعدادات"));
     }
 
-    private void showSearchScreen() {
+    private void showPersonnelCard() {
 
-        LinearLayout layout = createScreenLayout();
-
-        TextView title = createTitle("🔎 البحث عن منتسب");
-
-        TextView hint = new TextView(this);
-        hint.setText(
-                "يمكنك البحث باستخدام أي معلومة متاحة:\n" +
-                "الاسم • الرقم العسكري • الرقم الوطني • الرقم المالي"
-        );
-        hint.setTextSize(15);
-        hint.setTextColor(Color.DKGRAY);
-        hint.setGravity(Gravity.CENTER);
-        hint.setPadding(10, 10, 10, 20);
-
-        EditText searchBox = new EditText(this);
-        searchBox.setHint("اكتب الاسم أو الرقم");
-        searchBox.setSingleLine(true);
-
-        Button searchButton = new Button(this);
-        searchButton.setText("🔎 بحث");
-        searchButton.setTextSize(17);
-
-        TextView result = new TextView(this);
-        result.setText(
-                "نتيجة البحث ستظهر هنا\n\n" +
-                "وسيتم لاحقًا عرض:\n" +
-                "• صورة المنتسب\n" +
-                "• بطاقة المنتسب\n" +
-                "• البيانات الأساسية\n" +
-                "• البطاقة المالية المصغرة\n" +
-                "• التنبيهات والقرارات القريبة"
-        );
-        result.setTextSize(16);
-        result.setTextColor(Color.DKGRAY);
-        result.setPadding(15, 25, 15, 25);
-        result.setGravity(Gravity.CENTER);
-
-        Button back = new Button(this);
-        back.setText("↩ العودة إلى لوحة القيادة");
-
-        layout.addView(title);
-        layout.addView(hint);
-        layout.addView(searchBox);
-        layout.addView(searchButton);
-        layout.addView(result);
-        layout.addView(back);
-
-        setContentView(layout);
-
-        searchButton.setOnClickListener(v -> {
-
-            String value = searchBox.getText().toString().trim();
-
-            if (value.isEmpty()) {
-
-                Toast.makeText(
-                        MainActivity.this,
-                        "اكتب الاسم أو أحد أرقام المنتسب للبحث",
-                        Toast.LENGTH_SHORT
-                ).show();
-
-            } else {
-
-                result.setText(
-                        "🔎 تم تنفيذ البحث عن:\n\n" +
-                        value +
-                        "\n\n" +
-                        "سيتم ربط هذه الشاشة بقاعدة بيانات المنتسبين في المرحلة التالية."
-                );
-            }
-        });
-
-        back.setOnClickListener(v -> showDashboard());
-    }
-
-    private LinearLayout createScreenLayout() {
+        ScrollView scroll = new ScrollView(this);
 
         LinearLayout layout = new LinearLayout(this);
-
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setGravity(Gravity.CENTER_HORIZONTAL);
-        layout.setPadding(30, 30, 30, 30);
+        layout.setPadding(20, 20, 20, 30);
         layout.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-        layout.setBackgroundColor(Color.rgb(245, 247, 246));
+        layout.setBackgroundColor(light);
 
-        return layout;
-    }
+        TextView header = title("👤 بطاقة المنتسب");
 
-    private TextView createTitle(String text) {
-
-        TextView title = new TextView(this);
-
-        title.setText(text);
-        title.setTextSize(24);
-
-        // جعل العنوان عريضًا بالطريقة الصحيحة
-        title.setTypeface(
-                null,
-                android.graphics.Typeface.BOLD
+        TextView profile = cardText(
+                "الاسم: أحمد محمد علي\n" +
+                "الرتبة: ملازم أول\n" +
+                "الرقم العسكري: 100245\n" +
+                "الفرع: طرابلس\n" +
+                "الوحدة / القطاع: الإدارة العامة\n" +
+                "الحالة الحالية: مستمر في العمل"
         );
 
-        title.setTextColor(Color.rgb(27, 94, 32));
-        title.setGravity(Gravity.CENTER);
-        title.setPadding(10, 10, 10, 25);
+        TextView financial = section(
+                "💳 البطاقة المالية المصغرة",
+                "الرقم المالي: 458721\n" +
+                "الدرجة الوظيفية: 8\n" +
+                "الحالة المالية: راتب جاري\n" +
+                "حالة العمل: مستمر"
+        );
 
-        return title;
-    }
+        TextView movement = section(
+                "🔄 التكليف والندب والحركة",
+                "اتجاه الحركة: إلينا ← من جهة أخرى\n" +
+                "نوع الإجراء: ندب إلينا\n" +
+                "جهة التكليف: وزارة الداخلية\n" +
+                "تاريخ البداية: 01/01/2026\n" +
+                "تاريخ النهاية: 31/12/2026\n" +
+                "المدة: 12 شهرًا\n" +
+                "الحالة: ساري"
+        );
 
-    private void showMessage(String message) {
+        TextView alerts = section(
+                "🔔 التنبيهات",
+                "لا توجد تنبيهات عاجلة\n\n" +
+                "يمكن لاحقًا حساب التنبيهات تلقائيًا من تواريخ الوثائق والقرارات والتكليفات."
+        );
 
-        Toast.makeText(
-                MainActivity.this,
-                message,
-                Toast.LENGTH_SHORT
-        ).show();
-    }
-}
+        TextView data = section(
+                "📋 بيانات المنتسب",
+                "عدد الخانات المرتبطة بالمنتسب: 116\n\n" +
+                "البيانات الشخصية\n" +
+                "البيانات الوظيفية والعسكرية\n" +
+                "التعيين والترقيات\n" +
+                "التكليف والندب والنقل\n" +
+                "الدورات والمؤهلات\n" +
+                "اللغات\n" +
+                "الوثائق والتنبيهات\n" +
+                "الأوسمة والجزاءات\n" +
+                "الإصابات والقضايا\n" +
+                "التقييم السنوي\n" +
+                "السلاح واللاسلكي والمركبة والمعدات"
+        );
+
+        Button edit = button("✏ تعديل بيانات المنتسب");
+        Button archive = button("📁 أرشيف المنتسب");
+        Button back = button("↩ العودة إلى لوحة القيادة");
+
+        layout.addView(header);
+        layout.addView(profile);
+        layout.addView(financial);
+        layout.addView(movement);
+        layout.addView(alerts);
