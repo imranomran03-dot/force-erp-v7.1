@@ -17,6 +17,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         showLogin();
     }
 
@@ -70,8 +71,11 @@ public class MainActivity extends Activity {
             String pass = password.getText().toString();
 
             if (user.equals("admin") && pass.equals("Admin2026")) {
+
                 showDashboard();
+
             } else {
+
                 Toast.makeText(
                         MainActivity.this,
                         "اسم المستخدم أو كلمة المرور غير صحيحة",
@@ -263,7 +267,13 @@ public class MainActivity extends Activity {
 
         title.setText(text);
         title.setTextSize(24);
-        title.setTextStyle(1);
+
+        // جعل العنوان عريضًا بالطريقة الصحيحة
+        title.setTypeface(
+                null,
+                android.graphics.Typeface.BOLD
+        );
+
         title.setTextColor(Color.rgb(27, 94, 32));
         title.setGravity(Gravity.CENTER);
         title.setPadding(10, 10, 10, 25);
