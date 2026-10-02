@@ -17,6 +17,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         showLogin();
     }
 
@@ -33,11 +34,13 @@ public class MainActivity extends Activity {
         title.setTextSize(24);
         title.setTextColor(Color.DKGRAY);
         title.setGravity(Gravity.CENTER);
+        title.setPadding(0, 0, 0, 30);
 
         TextView version = new TextView(this);
         version.setText("V7.1");
         version.setTextSize(18);
         version.setGravity(Gravity.CENTER);
+        version.setPadding(0, 0, 0, 30);
 
         EditText username = new EditText(this);
         username.setHint("اسم المستخدم");
@@ -68,8 +71,11 @@ public class MainActivity extends Activity {
             String pass = password.getText().toString();
 
             if (user.equals("admin") && pass.equals("Admin2026")) {
+
                 showDashboard();
+
             } else {
+
                 Toast.makeText(
                         MainActivity.this,
                         "اسم المستخدم أو كلمة المرور غير صحيحة",
@@ -82,5 +88,55 @@ public class MainActivity extends Activity {
     private void showDashboard() {
 
         setContentView(R.layout.activity_main);
+
+        setupDashboardButtons();
+    }
+
+    private void setupDashboardButtons() {
+
+        Button personnel = findViewById(R.id.btnPersonnel);
+        Button search = findViewById(R.id.btnSearch);
+        Button reports = findViewById(R.id.btnReports);
+        Button financial = findViewById(R.id.btnFinancial);
+        Button courses = findViewById(R.id.btnCourses);
+        Button movement = findViewById(R.id.btnMovement);
+        Button settings = findViewById(R.id.btnSettings);
+
+        personnel.setOnClickListener(v ->
+                showMessage("شاشة المنتسبين ستكون هنا")
+        );
+
+        search.setOnClickListener(v ->
+                showMessage("شاشة البحث عن منتسب ستكون هنا")
+        );
+
+        reports.setOnClickListener(v ->
+                showMessage("شاشة التقارير والإحصائيات ستكون هنا")
+        );
+
+        financial.setOnClickListener(v ->
+                showMessage("شاشة البطاقة المالية ستكون هنا")
+        );
+
+        courses.setOnClickListener(v ->
+                showMessage("شاشة الدورات والمؤهلات ستكون هنا")
+        );
+
+        movement.setOnClickListener(v ->
+                showMessage("شاشة الحركة والتنقلات ستكون هنا")
+        );
+
+        settings.setOnClickListener(v ->
+                showMessage("شاشة الإعدادات ستكون هنا")
+        );
+    }
+
+    private void showMessage(String message) {
+
+        Toast.makeText(
+                MainActivity.this,
+                message,
+                Toast.LENGTH_SHORT
+        ).show();
     }
 }
