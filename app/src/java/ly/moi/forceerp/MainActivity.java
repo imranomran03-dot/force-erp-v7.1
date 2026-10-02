@@ -17,7 +17,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         showLogin();
     }
 
@@ -34,13 +33,11 @@ public class MainActivity extends Activity {
         title.setTextSize(24);
         title.setTextColor(Color.DKGRAY);
         title.setGravity(Gravity.CENTER);
-        title.setPadding(0, 0, 0, 40);
 
         TextView version = new TextView(this);
         version.setText("V7.1");
         version.setTextSize(18);
         version.setGravity(Gravity.CENTER);
-        version.setPadding(0, 0, 0, 30);
 
         EditText username = new EditText(this);
         username.setHint("اسم المستخدم");
@@ -84,42 +81,6 @@ public class MainActivity extends Activity {
 
     private void showDashboard() {
 
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(30, 40, 30, 30);
-        layout.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-
-        TextView title = new TextView(this);
-        title.setText("رئاسة قوة العمومية");
-        title.setTextSize(26);
-        title.setGravity(Gravity.CENTER);
-        title.setPadding(0, 0, 0, 30);
-
-        TextView welcome = new TextView(this);
-        welcome.setText("لوحة التحكم الرئيسية");
-        welcome.setTextSize(20);
-        welcome.setGravity(Gravity.CENTER);
-        welcome.setPadding(0, 0, 0, 30);
-
-        Button personnel = new Button(this);
-        personnel.setText("المنتسبون");
-
-        Button search = new Button(this);
-        search.setText("البحث عن منتسب");
-
-        Button reports = new Button(this);
-        reports.setText("التقارير");
-
-        Button settings = new Button(this);
-        settings.setText("الإعدادات");
-
-        layout.addView(title);
-        layout.addView(welcome);
-        layout.addView(personnel);
-        layout.addView(search);
-        layout.addView(reports);
-        layout.addView(settings);
-
-        setContentView(layout);
+        setContentView(R.layout.activity_main);
     }
 }
