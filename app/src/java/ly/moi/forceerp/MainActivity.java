@@ -14,29 +14,25 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Space;
 
 public class MainActivity extends Activity {
 
-    // =========================================================
-    // الألوان
-    // =========================================================
-    private static final int GREEN = Color.rgb(20, 112, 70);
-    private static final int DARK_GREEN = Color.rgb(12, 73, 48);
-    private static final int GOLD = Color.rgb(196, 155, 60);
-    private static final int DARK = Color.rgb(30, 35, 38);
-    private static final int GRAY = Color.rgb(105, 110, 115);
-    private static final int LIGHT = Color.rgb(246, 248, 247);
-    private static final int WHITE = Color.WHITE;
-    private static final int RED = Color.rgb(190, 55, 55);
-    private static final int BLUE = Color.rgb(48, 101, 170);
-    private static final int ORANGE = Color.rgb(215, 130, 35);
+    private final int GREEN = Color.rgb(20, 92, 55);
+    private final int DARK_GREEN = Color.rgb(10, 55, 34);
+    private final int GOLD = Color.rgb(196, 155, 61);
+    private final int RED = Color.rgb(190, 45, 45);
+    private final int BLUE = Color.rgb(35, 92, 150);
+    private final int ORANGE = Color.rgb(210, 125, 35);
+    private final int PURPLE = Color.rgb(105, 70, 150);
+    private final int GRAY = Color.rgb(105, 105, 105);
+    private final int LIGHT = Color.rgb(246, 248, 247);
+    private final int WHITE = Color.WHITE;
+    private final int DARK = Color.rgb(35, 35, 35);
 
-    // الحاوية الداخلية للواجهة
+    private ScrollView scrollView;
     private LinearLayout root;
 
-    // =========================================================
-    // بداية التطبيق
-    // =========================================================
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,219 +40,158 @@ public class MainActivity extends Activity {
     }
 
     // =========================================================
-    // شاشة تسجيل الدخول
+    // LOGIN
     // =========================================================
+
     private void showLogin() {
 
-        root = createBaseLayout();
+        LinearLayout page = new LinearLayout(this);
+        page.setOrientation(LinearLayout.VERTICAL);
+        page.setGravity(Gravity.CENTER);
+        page.setPadding(35, 30, 35, 30);
+        page.setBackgroundColor(LIGHT);
 
-        LinearLayout box = new LinearLayout(this);
-        box.setOrientation(LinearLayout.VERTICAL);
-        box.setGravity(Gravity.CENTER_HORIZONTAL);
-        box.setPadding(35, 30, 35, 30);
+        TextView logo = new TextView(this);
+        logo.setText("قوة العمومية");
+        logo.setTextSize(30);
+        logo.setTextColor(GREEN);
+        logo.setTypeface(null, Typeface.BOLD);
+        logo.setGravity(Gravity.CENTER);
 
-        GradientDrawable boxBackground = new GradientDrawable();
-        boxBackground.setColor(WHITE);
-        boxBackground.setCornerRadius(28);
-        boxBackground.setStroke(2, GOLD);
-        box.setBackground(boxBackground);
+        page.addView(logo, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
 
-        TextView title = createTitle(
-                "منظومة إدارة القوة العمومية",
-                25,
-                DARK_GREEN
-        );
+        TextView title = new TextView(this);
+        title.setText("منظومة إدارة القوة العمومية");
+        title.setTextSize(24);
+        title.setTextColor(DARK_GREEN);
+        title.setTypeface(null, Typeface.BOLD);
+        title.setGravity(Gravity.CENTER);
 
-        TextView version = createText(
-                "V7.1",
-                18,
-                GOLD
-        );
-        version.setGravity(Gravity.CENTER);
-
-        TextView ministry = createText(
-                "رئاسة جهاز مكافحة الهجرة غير الشرعية",
-                15,
-                GRAY
-        );
-        ministry.setGravity(Gravity.CENTER);
-
-        EditText username = new EditText(this);
-        username.setHint("اسم المستخدم");
-        username.setTextSize(17);
-        username.setSingleLine(true);
-        username.setPadding(22, 5, 22, 5);
-
-        GradientDrawable userBg = new GradientDrawable();
-        userBg.setColor(Color.rgb(248, 249, 249));
-        userBg.setCornerRadius(18);
-        userBg.setStroke(1, Color.LTGRAY);
-        username.setBackground(userBg);
-
-        LinearLayout.LayoutParams userParams =
+        LinearLayout.LayoutParams titleParams =
                 new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
-                        60
+                        LinearLayout.LayoutParams.WRAP_CONTENT
                 );
+        titleParams.setMargins(0, 12, 0, 5);
+        page.addView(title, titleParams);
 
-        userParams.setMargins(0, 30, 0, 15);
+        TextView version = new TextView(this);
+        version.setText("V7.1");
+        version.setTextSize(18);
+        version.setTextColor(GOLD);
+        version.setGravity(Gravity.CENTER);
 
-        EditText password = new EditText(this);
-        password.setHint("الرقم السري");
-        password.setTextSize(17);
-        password.setSingleLine(true);
+        page.addView(version);
+
+        Space space = new Space(this);
+        page.addView(space, new LinearLayout.LayoutParams(
+                1, 35
+        ));
+
+        EditText username = createInput("اسم المستخدم");
+        username.setInputType(InputType.TYPE_CLASS_TEXT);
+
+        page.addView(username, matchParams(12));
+
+        EditText password = createInput("الرقم السري");
         password.setInputType(
                 InputType.TYPE_CLASS_TEXT |
                 InputType.TYPE_TEXT_VARIATION_PASSWORD
         );
-        password.setPadding(22, 5, 22, 5);
 
-        GradientDrawable passBg = new GradientDrawable();
-        passBg.setColor(Color.rgb(248, 249, 249));
-        passBg.setCornerRadius(18);
-        passBg.setStroke(1, Color.LTGRAY);
-        password.setBackground(passBg);
+        page.addView(password, matchParams(12));
 
-        LinearLayout.LayoutParams passParams =
-                new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        60
-                );
+        Button login = createMainButton("دخول إلى المنظومة");
 
-        passParams.setMargins(0, 0, 0, 25);
+        page.addView(login, matchParams(18));
 
-        Button login = createButton(
-                "دخول إلى المنظومة",
-                GREEN
+        TextView info = new TextView(this);
+        info.setText(
+                "رئاسة جهاز مكافحة الهجرة غير الشرعية\n" +
+                "نظام إدارة القوة والمنتسبين"
         );
+        info.setTextSize(13);
+        info.setTextColor(GRAY);
+        info.setGravity(Gravity.CENTER);
+        page.addView(info, matchParams(20));
 
-        login.setTextSize(18);
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-        login.setOnClickListener(v -> {
+                String user = username.getText().toString().trim();
+                String pass = password.getText().toString().trim();
 
-            String user = username.getText().toString().trim();
-            String pass = password.getText().toString().trim();
+                if (user.isEmpty() || pass.isEmpty()) {
+                    showMessage("يرجى إدخال اسم المستخدم والرقم السري");
+                    return;
+                }
 
-            if (user.length() == 0 || pass.length() == 0) {
-
-                Toast.makeText(
-                        MainActivity.this,
-                        "أدخل اسم المستخدم والرقم السري",
-                        Toast.LENGTH_SHORT
-                ).show();
-
-                return;
+                showDashboard();
             }
-
-            showDashboard();
         });
 
-        box.addView(title);
-        box.addView(version);
-        box.addView(ministry);
-        box.addView(username, userParams);
-        box.addView(password, passParams);
-        box.addView(login);
-
-        root.addView(
-                box,
-                new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                )
-        );
-
-        setContentViewFromRoot();
+        setContentView(page);
     }
 
     // =========================================================
-    // لوحة القيادة التفاعلية
+    // DASHBOARD
     // =========================================================
+
     private void showDashboard() {
 
-        root = createBaseLayout();
+        createScrollablePage();
 
-        root.addView(
-                createTitle(
-                        "لوحة القيادة الاستراتيجية",
-                        25,
-                        DARK_GREEN
-                )
+        addHeader(
+                "لوحة القيادة الاستراتيجية",
+                "رئاسة جهاز مكافحة الهجرة غير الشرعية\n" +
+                "منظومة إدارة القوة العمومية V7.1"
         );
 
-        root.addView(
-                createText(
-                        "رئاسة جهاز مكافحة الهجرة غير الشرعية\n" +
-                        "منظومة إدارة القوة العمومية V7.1",
-                        15,
-                        GRAY
-                )
+        TextView totalTitle = createText(
+                "إجمالي القوة الحالية",
+                17,
+                DARK_GREEN
         );
+        totalTitle.setGravity(Gravity.CENTER);
+        root.addView(totalTitle, matchParams(8));
 
-        // =====================================================
-        // إجمالي القوة
-        // =====================================================
-
-        LinearLayout totalCard = createCard(GREEN);
-
-        totalCard.addView(
-                createText(
-                        "إجمالي القوة",
-                        17,
-                        WHITE
-                )
-        );
-
-        TextView totalNumber = createText(
+        TextView total = createText(
                 "1,250",
-                38,
-                WHITE
+                42,
+                GREEN
         );
+        total.setTypeface(null, Typeface.BOLD);
+        total.setGravity(Gravity.CENTER);
+        root.addView(total, matchParams(2));
 
-        totalNumber.setTypeface(null, Typeface.BOLD);
-        totalNumber.setGravity(Gravity.CENTER);
-
-        totalCard.addView(totalNumber);
-
-        TextView totalDesc = createText(
+        TextView totalSub = createText(
                 "منتسب وموظف",
                 14,
-                WHITE
+                GRAY
         );
+        totalSub.setGravity(Gravity.CENTER);
+        root.addView(totalSub, matchParams(12));
 
-        totalDesc.setGravity(Gravity.CENTER);
-
-        totalCard.addView(totalDesc);
-
-        LinearLayout.LayoutParams totalParams =
-                new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        145
-                );
-
-        totalParams.setMargins(0, 20, 0, 15);
-
-        root.addView(totalCard, totalParams);
-
-        // =====================================================
-        // توزيع القوة
-        // =====================================================
-
-        root.addView(
-                createSection("توزيع القوة حسب الفئة")
-        );
+        // -----------------------------------------------------
+        // CATEGORY CARDS
+        // -----------------------------------------------------
 
         LinearLayout row1 = new LinearLayout(this);
         row1.setOrientation(LinearLayout.HORIZONTAL);
+        row1.setGravity(Gravity.CENTER);
 
         row1.addView(
                 createStatCard(
                         "الضباط",
                         "180",
                         "14.4%",
-                        DARK_GREEN
+                        GREEN
                 ),
-                createWeightParams()
+                weightParams()
         );
 
         row1.addView(
@@ -266,22 +201,23 @@ public class MainActivity extends Activity {
                         "33.6%",
                         BLUE
                 ),
-                createWeightParams()
+                weightParams()
         );
 
-        root.addView(row1);
+        root.addView(row1, matchParams(8));
 
         LinearLayout row2 = new LinearLayout(this);
         row2.setOrientation(LinearLayout.HORIZONTAL);
+        row2.setGravity(Gravity.CENTER);
 
         row2.addView(
                 createStatCard(
                         "الأفراد",
                         "530",
                         "42.4%",
-                        GREEN
+                        ORANGE
                 ),
-                createWeightParams()
+                weightParams()
         );
 
         row2.addView(
@@ -289,1039 +225,1270 @@ public class MainActivity extends Activity {
                         "الموظفون",
                         "120",
                         "9.6%",
-                        ORANGE
+                        PURPLE
                 ),
-                createWeightParams()
+                weightParams()
         );
 
-        root.addView(row2);
+        root.addView(row2, matchParams(12));
 
-        // =====================================================
-        // الموقف الحالي
-        // =====================================================
+        // -----------------------------------------------------
+        // CURRENT STATUS
+        // -----------------------------------------------------
 
         root.addView(
-                createSection("الموقف الحالي")
+                createSectionTitle(
+                        "الموقف الحالي للقوة"
+                ),
+                matchParams(8)
         );
 
-        LinearLayout statusCard = createWhiteCard();
-
-        statusCard.addView(
-                createStatusRow(
-                        "مستمرون بالعمل",
+        root.addView(
+                createStatusCard(
+                        "مستمرون",
                         "82%",
                         GREEN
-                )
+                ),
+                matchParams(5)
         );
 
-        statusCard.addView(
-                createStatusRow(
-                        "منتدبون",
+        root.addView(
+                createStatusCard(
+                        "مكلفون",
                         "8%",
                         BLUE
-                )
+                ),
+                matchParams(5)
         );
 
-        statusCard.addView(
-                createStatusRow(
-                        "مكلفون",
+        root.addView(
+                createStatusCard(
+                        "منتدبون",
                         "4%",
-                        ORANGE
-                )
+                        PURPLE
+                ),
+                matchParams(5)
         );
 
-        statusCard.addView(
-                createStatusRow(
+        root.addView(
+                createStatusCard(
                         "موقوفون",
                         "2%",
                         RED
-                )
+                ),
+                matchParams(5)
         );
-
-        statusCard.addView(
-                createStatusRow(
-                        "منقطعون",
-                        "3%",
-                        GRAY
-                )
-        );
-
-        statusCard.addView(
-                createStatusRow(
-                        "إجازات",
-                        "6%",
-                        GOLD
-                )
-        );
-
-        root.addView(statusCard);
-
-        // =====================================================
-        // المؤشرات والتنبيهات
-        // =====================================================
 
         root.addView(
-                createSection("المؤشرات والتنبيهات")
+                createStatusCard(
+                        "إجازة",
+                        "3%",
+                        ORANGE
+                ),
+                matchParams(5)
         );
 
-        LinearLayout alertsRow = new LinearLayout(this);
-        alertsRow.setOrientation(LinearLayout.HORIZONTAL);
+        root.addView(
+                createStatusCard(
+                        "دورات",
+                        "6%",
+                        GOLD
+                ),
+                matchParams(12)
+        );
+
+        // -----------------------------------------------------
+        // ALERTS
+        // -----------------------------------------------------
+
+        root.addView(
+                createSectionTitle(
+                        "مركز التنبيهات والمؤشرات"
+                ),
+                matchParams(8)
+        );
+
+        LinearLayout alertsRow =
+                new LinearLayout(this);
+
+        alertsRow.setOrientation(
+                LinearLayout.HORIZONTAL
+        );
 
         alertsRow.addView(
-                createMiniCard(
-                        "تنبيهات",
+                createAlertCard(
+                        "التنبيهات",
                         "24",
                         RED
                 ),
-                createMiniWeightParams()
+                weightParams()
         );
 
         alertsRow.addView(
-                createMiniCard(
+                createAlertCard(
                         "بيانات ناقصة",
                         "17",
                         ORANGE
                 ),
-                createMiniWeightParams()
+                weightParams()
         );
 
-        alertsRow.addView(
-                createMiniCard(
+        root.addView(
+                alertsRow,
+                matchParams(7)
+        );
+
+        LinearLayout alertsRow2 =
+                new LinearLayout(this);
+
+        alertsRow2.setOrientation(
+                LinearLayout.HORIZONTAL
+        );
+
+        alertsRow2.addView(
+                createAlertCard(
                         "ترقيات قريبة",
                         "9",
                         BLUE
                 ),
-                createMiniWeightParams()
+                weightParams()
         );
 
-        alertsRow.addView(
-                createMiniCard(
+        alertsRow2.addView(
+                createAlertCard(
                         "قرارات قريبة",
                         "6",
-                        GOLD
+                        PURPLE
                 ),
-                createMiniWeightParams()
+                weightParams()
         );
 
-        root.addView(alertsRow);
+        root.addView(
+                alertsRow2,
+                matchParams(12)
+        );
 
-        // =====================================================
-        // الوصول السريع
-        // =====================================================
+        // -----------------------------------------------------
+        // QUICK ACCESS
+        // -----------------------------------------------------
 
         root.addView(
-                createSection("الوصول السريع")
+                createSectionTitle(
+                        "الوصول السريع"
+                ),
+                matchParams(8)
         );
 
         root.addView(
                 createDashboardButton(
                         "👤  المنتسبون",
-                        () -> showPersonnel()
-                )
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showPersonnel();
+                            }
+                        }
+                ),
+                matchParams(6)
         );
 
         root.addView(
                 createDashboardButton(
-                        "🔎  البحث عن منتسب",
-                        () -> showSearch()
-                )
+                        "🔎  البحث الذكي",
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showSearch();
+                            }
+                        }
+                ),
+                matchParams(6)
         );
 
         root.addView(
                 createDashboardButton(
                         "📊  التقارير",
-                        () -> showReports()
-                )
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showReports();
+                            }
+                        }
+                ),
+                matchParams(6)
         );
 
         root.addView(
                 createDashboardButton(
-                        "💳  البطاقات المالية",
-                        () -> showFinancial()
-                )
+                        "💳  البطاقة المالية",
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showFinancial();
+                            }
+                        }
+                ),
+                matchParams(6)
         );
 
         root.addView(
                 createDashboardButton(
                         "🎓  الدورات والمؤهلات",
-                        () -> showCourses()
-                )
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showCourses();
+                            }
+                        }
+                ),
+                matchParams(6)
         );
 
         root.addView(
                 createDashboardButton(
-                        "🚔  الحركة والتكليف",
-                        () -> showMovement()
-                )
+                        "🚘  الحركة والتكليفات",
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showMovement();
+                            }
+                        }
+                ),
+                matchParams(6)
         );
 
         root.addView(
                 createDashboardButton(
                         "⚙  الإعدادات",
-                        () -> showSettings()
-                )
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showSettings();
+                            }
+                        }
+                ),
+                matchParams(6)
         );
 
-        // =====================================================
-        // الأرشيف
-        // =====================================================
+        // -----------------------------------------------------
+        // ARCHIVE
+        // -----------------------------------------------------
 
         root.addView(
-                createSection("الأرشيف الإلكتروني")
+                createSectionTitle(
+                        "الأرشيف الإلكتروني"
+                ),
+                matchParams(12)
         );
 
-        LinearLayout archive = createWhiteCard();
-
-        archive.addView(
-                createArchiveItem(
-                        "📁",
-                        "القرارات"
-                )
+        root.addView(
+                createArchiveCard(
+                        "📁 قرارات",
+                        "أرشيف القرارات والتكليفات والترقيات"
+                ),
+                matchParams(6)
         );
 
-        archive.addView(
-                createArchiveItem(
-                        "👤",
-                        "ملفات المنتسبين"
-                )
+        root.addView(
+                createArchiveCard(
+                        "👤 ملفات المنتسبين",
+                        "الملفات والمستندات الشخصية"
+                ),
+                matchParams(6)
         );
 
-        archive.addView(
-                createArchiveItem(
-                        "🎓",
-                        "الشهادات"
-                )
+        root.addView(
+                createArchiveCard(
+                        "🎓 الشهادات",
+                        "الدورات والمؤهلات والشهادات"
+                ),
+                matchParams(6)
         );
 
-        archive.addView(
-                createArchiveItem(
-                        "📄",
-                        "المستندات"
-                )
+        root.addView(
+                createArchiveCard(
+                        "📄 المستندات",
+                        "المستندات والوثائق الرسمية"
+                ),
+                matchParams(12)
         );
 
-        root.addView(archive);
+        addFooter();
 
-        // =====================================================
-        // تسجيل الخروج
-        // =====================================================
-
-        Button logout = createButton(
-                "تسجيل الخروج",
-                DARK
-        );
-
-        logout.setOnClickListener(
-                v -> showLogin()
-        );
-
-        LinearLayout.LayoutParams logoutParams =
-                new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        58
-                );
-
-        logoutParams.setMargins(0, 25, 0, 30);
-
-        root.addView(logout, logoutParams);
-
-        setContentViewFromRoot();
+        setContentView(scrollView);
     }
 
     // =========================================================
-    // المنتسبون
+    // PERSONNEL
     // =========================================================
 
     private void showPersonnel() {
 
-        root = createBaseLayout();
+        createScrollablePage();
 
-        addBackButton();
-
-        root.addView(
-                createTitle(
-                        "المنتسبون",
-                        25,
-                        DARK_GREEN
-                )
-        );
-
-        root.addView(
-                createText(
-                        "إدارة بيانات القوة العمومية",
-                        15,
-                        GRAY
-                )
-        );
-
-        root.addView(
-                createInfoCard(
-                        "إجمالي السجلات",
-                        "1,250"
-                )
+        addHeader(
+                "إدارة المنتسبين",
+                "بطاقات المنتسبين والبيانات الأساسية"
         );
 
         root.addView(
                 createDashboardButton(
-                        "إضافة منتسب جديد",
-                        () -> showMessage(
-                                "شاشة إضافة المنتسب - سيتم ربطها بالـ116 خانة"
-                        )
-                )
+                        "➕ إضافة منتسب جديد",
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showMessage(
+                                        "شاشة إضافة منتسب\n" +
+                                        "تتضمن جميع الحقول الـ116"
+                                );
+                            }
+                        }
+                ),
+                matchParams(8)
         );
 
         root.addView(
                 createDashboardButton(
-                        "بطاقة المنتسب",
-                        () -> showPersonnelCard()
-                )
+                        "🔎 البحث عن منتسب",
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showSearch();
+                            }
+                        }
+                ),
+                matchParams(8)
+        );
+
+        root.addView(
+                createPersonnelPreview(
+                        "عمران محمد مثال",
+                        "رائد",
+                        "القوة العمومية",
+                        "مستمر"
+                ),
+                matchParams(12)
         );
 
         root.addView(
                 createDashboardButton(
-                        "البحث عن منتسب",
-                        () -> showSearch()
-                )
+                        "👁 فتح بطاقة المنتسب",
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showPersonnelCard();
+                            }
+                        }
+                ),
+                matchParams(8)
         );
 
-        setContentViewFromRoot();
+        root.addView(
+                createBackButton(),
+                matchParams(12)
+        );
+
+        setContentView(scrollView);
     }
 
     // =========================================================
-    // بطاقة المنتسب
+    // PERSONNEL CARD
     // =========================================================
 
     private void showPersonnelCard() {
 
-        root = createBaseLayout();
+        createScrollablePage();
 
-        addBackButton();
-
-        root.addView(
-                createTitle(
-                        "بطاقة المنتسب",
-                        24,
-                        DARK_GREEN
-                )
-        );
-
-        LinearLayout profile = createWhiteCard();
-
-        TextView photo = createText(
-                "صورة\nالمنتسب",
-                18,
-                GRAY
-        );
-
-        photo.setGravity(Gravity.CENTER);
-
-        GradientDrawable photoBg =
-                new GradientDrawable();
-
-        photoBg.setColor(
-                Color.rgb(235, 238, 237)
-        );
-
-        photoBg.setCornerRadius(20);
-
-        photo.setBackground(photoBg);
-
-        profile.addView(
-                photo,
-                new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        150
-                )
-        );
-
-        profile.addView(
-                createText(
-                        "الاسم: اسم المنتسب الثلاثي",
-                        17,
-                        DARK
-                )
-        );
-
-        profile.addView(
-                createText(
-                        "الرتبة: —",
-                        16,
-                        DARK
-                )
-        );
-
-        profile.addView(
-                createText(
-                        "الرقم العسكري: —",
-                        16,
-                        DARK
-                )
-        );
-
-        profile.addView(
-                createText(
-                        "الرقم الوطني: —",
-                        16,
-                        DARK
-                )
-        );
-
-        profile.addView(
-                createText(
-                        "الحالة الحالية: مستمر",
-                        16,
-                        GREEN
-                )
-        );
-
-        root.addView(profile);
-
-        root.addView(
-                createSection("البطاقة المالية")
+        addHeader(
+                "بطاقة المنتسب",
+                "البيانات الشخصية والوظيفية والمالية"
         );
 
         root.addView(
-                createInfoCard(
-                        "الحالة المالية",
-                        "جاري"
-                )
+                createProfileCard(),
+                matchParams(12)
         );
 
         root.addView(
-                createSection(
-                        "بيانات الحركة والتكليف"
-                )
+                createSectionTitle(
+                        "البطاقة المالية المختصرة"
+                ),
+                matchParams(8)
         );
 
         root.addView(
-                createInfoCard(
-                        "نوع التكليف",
-                        "—"
-                )
+                createMiniFinancialCard(),
+                matchParams(12)
         );
 
         root.addView(
-                createInfoCard(
-                        "الاتجاه",
-                        "منا / إلينا"
-                )
+                createSectionTitle(
+                        "الحركة والتكليف"
+                ),
+                matchParams(8)
         );
 
         root.addView(
-                createInfoCard(
-                        "جهة التكليف",
-                        "—"
-                )
+                createMovementSummary(),
+                matchParams(12)
         );
 
         root.addView(
-                createSection(
-                        "بيانات السجل"
-                )
+                createSectionTitle(
+                        "التنبيهات"
+                ),
+                matchParams(8)
         );
 
         root.addView(
-                createInfoCard(
-                        "عدد الخانات",
-                        "116 خانة"
-                )
+                createAlertCard(
+                        "تنبيه البيانات",
+                        "2",
+                        ORANGE
+                ),
+                matchParams(10)
         );
 
         root.addView(
-                createText(
-                        "تشمل بيانات الهوية والرتبة والتعيين " +
-                        "والترقيات والتكليف والدورات والمؤهلات " +
-                        "واللغات والوثائق والتنبيهات والأوسمة " +
-                        "والجزاءات والقضايا والإصابات والمركبات " +
-                        "والمعدات وغيرها.",
-                        14,
-                        GRAY
-                )
+                createSectionTitle(
+                        "جميع بيانات المنتسب - 116 خانة"
+                ),
+                matchParams(8)
         );
+
+        String[] fields = getAll116Fields();
+
+        for (int i = 0; i < fields.length; i++) {
+
+            root.addView(
+                    createDataRow(
+                            (i + 1) + ". " + fields[i],
+                            "غير مدخل"
+                    ),
+                    matchParams(3)
+            );
+        }
 
         root.addView(
                 createDashboardButton(
-                        "تعديل بيانات المنتسب",
-                        () -> showMessage(
-                                "سيتم ربط التعديل بقاعدة البيانات"
-                        )
-                )
+                        "✏ تعديل بيانات المنتسب",
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showMessage(
+                                        "سيتم فتح نموذج تعديل البيانات"
+                                );
+                            }
+                        }
+                ),
+                matchParams(8)
         );
 
-        setContentViewFromRoot();
+        root.addView(
+                createBackButton(),
+                matchParams(12)
+        );
+
+        setContentView(scrollView);
     }
 
     // =========================================================
-    // البحث
+    // SEARCH
     // =========================================================
 
     private void showSearch() {
 
-        root = createBaseLayout();
+        createScrollablePage();
 
-        addBackButton();
+        addHeader(
+                "البحث الذكي",
+                "البحث باستخدام حقل واحد أو عدة حقول معًا"
+        );
+
+        EditText name =
+                createInput("الاسم الثلاثي");
+
+        EditText military =
+                createInput("الرقم العسكري / الحسابي");
+
+        EditText national =
+                createInput("الرقم الوطني");
+
+        EditText financial =
+                createInput("الرقم المالي");
+
+        EditText rank =
+                createInput("الرتبة");
+
+        EditText branch =
+                createInput("الفرع / الإدارة");
+
+        EditText city =
+                createInput("مدينة الإقامة");
+
+        root.addView(name, matchParams(5));
+        root.addView(military, matchParams(5));
+        root.addView(national, matchParams(5));
+        root.addView(financial, matchParams(5));
+        root.addView(rank, matchParams(5));
+        root.addView(branch, matchParams(5));
+        root.addView(city, matchParams(8));
 
         root.addView(
-                createTitle(
-                        "البحث عن منتسب",
-                        24,
-                        DARK_GREEN
-                )
-        );
+                createDashboardButton(
+                        "🔎 تنفيذ البحث",
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
 
-        EditText search = new EditText(this);
+                                String query =
+                                        "بحث متعدد الحقول\n\n" +
+                                        "الاسم: " +
+                                        name.getText().toString() +
+                                        "\nالرقم العسكري: " +
+                                        military.getText().toString() +
+                                        "\nالرقم الوطني: " +
+                                        national.getText().toString();
 
-        search.setHint(
-                "الاسم / الرقم العسكري / الرقم الوطني / الرقم الحسابي"
-        );
-
-        search.setTextSize(16);
-        search.setSingleLine(true);
-        search.setPadding(20, 5, 20, 5);
-
-        GradientDrawable searchBg =
-                new GradientDrawable();
-
-        searchBg.setColor(WHITE);
-        searchBg.setCornerRadius(18);
-        searchBg.setStroke(1, Color.LTGRAY);
-
-        search.setBackground(searchBg);
-
-        LinearLayout.LayoutParams searchParams =
-                new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        60
-                );
-
-        searchParams.setMargins(0, 10, 0, 10);
-
-        root.addView(
-                search,
-                searchParams
-        );
-
-        Button searchButton =
-                createButton(
-                        "بحث",
-                        GREEN
-                );
-
-        searchButton.setOnClickListener(
-                v -> {
-
-                    String value =
-                            search.getText()
-                                    .toString()
-                                    .trim();
-
-                    if (value.length() == 0) {
-
-                        showMessage(
-                                "أدخل قيمة للبحث"
-                        );
-
-                        return;
-                    }
-
-                    showMessage(
-                            "تم تنفيذ البحث عن:\n" + value
-                    );
-                }
-        );
-
-        root.addView(searchButton);
-
-        root.addView(
-                createSection(
-                        "البحث يمكن أن يعتمد على أي من بيانات المنتسب"
-                )
+                                showMessage(query);
+                            }
+                        }
+                ),
+                matchParams(8)
         );
 
         root.addView(
-                createText(
-                        "الاسم الثلاثي\n" +
-                        "الرقم العسكري\n" +
-                        "الرقم الوطني\n" +
-                        "الرقم الحسابي\n" +
-                        "أو أكثر من حقل معاً",
-                        16,
-                        DARK
-                )
+                createPersonnelPreview(
+                        "نتيجة البحث",
+                        "رائد",
+                        "القوة العمومية",
+                        "مستمر"
+                ),
+                matchParams(10)
         );
 
-        setContentViewFromRoot();
+        root.addView(
+                createDashboardButton(
+                        "👁 فتح بطاقة النتيجة",
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showPersonnelCard();
+                            }
+                        }
+                ),
+                matchParams(8)
+        );
+
+        root.addView(
+                createBackButton(),
+                matchParams(12)
+        );
+
+        setContentView(scrollView);
     }
 
     // =========================================================
-    // التقارير
-    // =========================================================
-
-    private void showReports() {
-
-        root = createBaseLayout();
-
-        addBackButton();
-
-        root.addView(
-                createTitle(
-                        "التقارير",
-                        24,
-                        DARK_GREEN
-                )
-        );
-
-        root.addView(
-                createDashboardButton(
-                        "تقرير القوة حسب الفئة",
-                        () -> showMessage(
-                                "الضباط / ضباط الصف / الأفراد / الموظفون"
-                        )
-                )
-        );
-
-        root.addView(
-                createDashboardButton(
-                        "تقرير الموقف الحالي",
-                        () -> showMessage(
-                                "مستمر / منتدب / مكلف / موقوف / منقطع / إجازة"
-                        )
-                )
-        );
-
-        root.addView(
-                createDashboardButton(
-                        "تقرير الترقيات",
-                        () -> showMessage(
-                                "تقرير الترقيات والاستحقاقات"
-                        )
-                );
-
-        root.addView(
-                createDashboardButton(
-                        "تقرير التكليفات",
-                        () -> showMessage(
-                                "التكليفات والانتدابات - منا / إلينا"
-                        )
-                );
-
-        setContentViewFromRoot();
-    }
-
-    // =========================================================
-    // البطاقة المالية
+    // FINANCIAL
     // =========================================================
 
     private void showFinancial() {
 
-        root = createBaseLayout();
+        createScrollablePage();
 
-        addBackButton();
-
-        root.addView(
-                createTitle(
-                        "البطاقات المالية",
-                        24,
-                        DARK_GREEN
-                )
+        addHeader(
+                "البطاقة المالية",
+                "البيانات المالية والوظيفية للمنتسب"
         );
 
         root.addView(
-                createInfoCard(
-                        "الحالة",
-                        "جاري"
-                )
+                createMiniFinancialCard(),
+                matchParams(12)
         );
 
         root.addView(
-                createInfoCard(
+                createDataRow(
                         "الرقم المالي",
-                        "—"
-                )
+                        "FIN-001250"
+                ),
+                matchParams(5)
         );
 
         root.addView(
-                createInfoCard(
-                        "الرقم العسكري",
-                        "—"
-                )
+                createDataRow(
+                        "الرقم الحسابي",
+                        "AC-001250"
+                ),
+                matchParams(5)
         );
 
         root.addView(
-                createInfoCard(
+                createDataRow(
                         "المصرف",
-                        "—"
-                )
+                        "مصرف الجمهورية"
+                ),
+                matchParams(5)
         );
 
         root.addView(
-                createInfoCard(
+                createDataRow(
                         "الفرع",
-                        "—"
-                )
+                        "بنغازي"
+                ),
+                matchParams(5)
         );
 
         root.addView(
-                createInfoCard(
-                        "رقم الحساب",
-                        "—"
-                )
-        );
-
-        root.addView(
-                createInfoCard(
+                createDataRow(
                         "الدرجة الوظيفية",
-                        "—"
-                )
+                        "الدرجة 10"
+                ),
+                matchParams(5)
         );
 
-        setContentViewFromRoot();
+        root.addView(
+                createDataRow(
+                        "حالة المرتب",
+                        "جاري"
+                ),
+                matchParams(5)
+        );
+
+        root.addView(
+                createDataRow(
+                        "حالة العمل",
+                        "مستمر"
+                ),
+                matchParams(8)
+        );
+
+        root.addView(
+                createDashboardButton(
+                        "👤 فتح بطاقة المنتسب",
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showPersonnelCard();
+                            }
+                        }
+                ),
+                matchParams(8)
+        );
+
+        root.addView(
+                createBackButton(),
+                matchParams(12)
+        );
+
+        setContentView(scrollView);
     }
 
     // =========================================================
-    // الدورات
+    // COURSES
     // =========================================================
 
     private void showCourses() {
 
-        root = createBaseLayout();
+        createScrollablePage();
 
-        addBackButton();
-
-        root.addView(
-                createTitle(
-                        "الدورات والمؤهلات",
-                        24,
-                        DARK_GREEN
-                )
+        addHeader(
+                "الدورات والمؤهلات",
+                "السجل التدريبي والتعليمي"
         );
 
         root.addView(
-                createDashboardButton(
+                createDataRow(
                         "الدورات التدريبية",
-                        () -> showMessage("تدريبية")
-                )
+                        "12"
+                ),
+                matchParams(6)
         );
 
         root.addView(
-                createDashboardButton(
+                createDataRow(
                         "الدورات التخصصية",
-                        () -> showMessage("تخصصية")
-                )
+                        "5"
+                ),
+                matchParams(6)
         );
 
         root.addView(
-                createDashboardButton(
+                createDataRow(
                         "الدورات التأهيلية",
-                        () -> showMessage("تأهيلية")
-                )
+                        "3"
+                ),
+                matchParams(6)
         );
 
         root.addView(
-                createDashboardButton(
+                createDataRow(
                         "ورش العمل",
-                        () -> showMessage("ورش")
-                )
+                        "4"
+                ),
+                matchParams(6)
+        );
+
+        root.addView(
+                createDataRow(
+                        "المؤهل العلمي",
+                        "ليسانس"
+                ),
+                matchParams(6)
+        );
+
+        root.addView(
+                createDataRow(
+                        "التخصص",
+                        "إدارة وأمن"
+                ),
+                matchParams(8)
         );
 
         root.addView(
                 createDashboardButton(
-                        "المؤهلات والشهادات",
-                        () -> showMessage(
-                                "المؤهلات والشهادات"
-                        )
-                )
+                        "➕ إضافة دورة / مؤهل",
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showMessage(
+                                        "إضافة دورة أو مؤهل جديد"
+                                );
+                            }
+                        }
+                ),
+                matchParams(8)
         );
 
-        setContentViewFromRoot();
+        root.addView(
+                createBackButton(),
+                matchParams(12)
+        );
+
+        setContentView(scrollView);
     }
 
     // =========================================================
-    // الحركة والتكليف
+    // MOVEMENT
     // =========================================================
 
     private void showMovement() {
 
-        root = createBaseLayout();
+        createScrollablePage();
 
-        addBackButton();
-
-        root.addView(
-                createTitle(
-                        "الحركة والتكليف",
-                        24,
-                        DARK_GREEN
-                )
+        addHeader(
+                "الحركة والتكليفات",
+                "متابعة التنقلات والانتدابات والتكليفات"
         );
 
         root.addView(
-                createInfoCard(
-                        "تكليف منا",
-                        "—"
-                )
+                createStatusCard(
+                        "تكليفات منا",
+                        "18",
+                        GREEN
+                ),
+                matchParams(8)
         );
 
         root.addView(
-                createInfoCard(
-                        "تكليف إلينا",
-                        "—"
-                )
+                createStatusCard(
+                        "تكليفات إلينا",
+                        "11",
+                        BLUE
+                ),
+                matchParams(8)
         );
 
         root.addView(
-                createInfoCard(
-                        "انتداب",
-                        "—"
-                )
+                createDataRow(
+                        "اتجاه التكليف",
+                        "منا / إلينا"
+                ),
+                matchParams(5)
         );
 
         root.addView(
-                createInfoCard(
-                        "تكليف",
-                        "—"
-                )
+                createDataRow(
+                        "نوع التكليف",
+                        "تكليف / انتداب"
+                ),
+                matchParams(5)
         );
 
         root.addView(
-                createInfoCard(
-                        "حركة وتنقلات",
-                        "—"
-                )
+                createDataRow(
+                        "جهة التكليف",
+                        "جهة أمنية"
+                ),
+                matchParams(5)
         );
 
-        setContentViewFromRoot();
+        root.addView(
+                createDataRow(
+                        "مكان التكليف",
+                        "بنغازي"
+                ),
+                matchParams(5)
+        );
+
+        root.addView(
+                createDataRow(
+                        "تاريخ البداية",
+                        "01/01/2026"
+                ),
+                matchParams(5)
+        );
+
+        root.addView(
+                createDataRow(
+                        "تاريخ النهاية",
+                        "31/12/2026"
+                ),
+                matchParams(8)
+        );
+
+        root.addView(
+                createDashboardButton(
+                        "➕ إضافة حركة / تكليف",
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showMessage(
+                                        "إضافة حركة جديدة\n" +
+                                        "الاتجاه: منا / إلينا"
+                                );
+                            }
+                        }
+                ),
+                matchParams(8)
+        );
+
+        root.addView(
+                createBackButton(),
+                matchParams(12)
+        );
+
+        setContentView(scrollView);
     }
 
     // =========================================================
-    // الإعدادات
+    // REPORTS
+    // =========================================================
+
+    private void showReports() {
+
+        createScrollablePage();
+
+        addHeader(
+                "التقارير الذكية",
+                "تقارير القوة والمنتسبين والموقف الحالي"
+        );
+
+        root.addView(
+                createDashboardButton(
+                        "📊 تقرير القوة حسب الفئة",
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showMessage(
+                                        "الضباط: 180\n" +
+                                        "ضباط الصف: 420\n" +
+                                        "الأفراد: 530\n" +
+                                        "الموظفون: 120"
+                                );
+                            }
+                        }
+                ),
+                matchParams(7)
+        );
+
+        root.addView(
+                createDashboardButton(
+                        "📈 تقرير الموقف الحالي",
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showMessage(
+                                        "مستمرون 82%\n" +
+                                        "مكلفون 8%\n" +
+                                        "منتدبون 4%\n" +
+                                        "موقوفون 2%\n" +
+                                        "إجازة 3%\n" +
+                                        "دورات 6%"
+                                );
+                            }
+                        }
+                ),
+                matchParams(7)
+        );
+
+        root.addView(
+                createDashboardButton(
+                        "⬆ تقرير الترقيات",
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showMessage(
+                                        "تقرير الترقيات والاستحقاقات"
+                                );
+                            }
+                        }
+                ),
+                matchParams(7)
+        );
+
+        root.addView(
+                createDashboardButton(
+                        "🚘 تقرير التكليفات",
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showMessage(
+                                        "تقرير التكليفات والانتدابات"
+                                );
+                            }
+                        }
+                ),
+                matchParams(7)
+        );
+
+        root.addView(
+                createDashboardButton(
+                        "⚠ تقرير التنبيهات",
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showMessage(
+                                        "24 تنبيه\n" +
+                                        "17 بيانات ناقصة\n" +
+                                        "9 ترقيات قريبة\n" +
+                                        "6 قرارات قريبة"
+                                );
+                            }
+                        }
+                ),
+                matchParams(7)
+        );
+
+        root.addView(
+                createBackButton(),
+                matchParams(12)
+        );
+
+        setContentView(scrollView);
+    }
+
+    // =========================================================
+    // SETTINGS
     // =========================================================
 
     private void showSettings() {
 
-        root = createBaseLayout();
+        createScrollablePage();
 
-        addBackButton();
-
-        root.addView(
-                createTitle(
-                        "الإعدادات",
-                        24,
-                        DARK_GREEN
-                )
+        addHeader(
+                "الإعدادات",
+                "إدارة النظام والمستخدمين"
         );
 
         root.addView(
                 createDashboardButton(
-                        "إدارة المستخدمين",
-                        () -> showMessage(
-                                "إدارة المستخدمين"
-                        )
-                )
+                        "👤 المستخدمون والصلاحيات",
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showMessage(
+                                        "مدير النظام\n" +
+                                        "مدخل بيانات\n" +
+                                        "مشاهد"
+                                );
+                            }
+                        }
+                ),
+                matchParams(8)
         );
 
         root.addView(
                 createDashboardButton(
-                        "الصلاحيات",
-                        () -> showMessage(
-                                "الصلاحيات"
-                        )
-                )
+                        "🔐 الأمان وسجل العمليات",
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showMessage(
+                                        "سجل العمليات والأمان"
+                                );
+                            }
+                        }
+                ),
+                matchParams(8)
         );
 
         root.addView(
                 createDashboardButton(
-                        "النسخ الاحتياطي",
-                        () -> showMessage(
-                                "النسخ الاحتياطي"
-                        )
-                )
+                        "💾 النسخ الاحتياطي",
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showMessage(
+                                        "إدارة النسخ الاحتياطية"
+                                );
+                            }
+                        }
+                ),
+                matchParams(8)
         );
 
         root.addView(
                 createDashboardButton(
-                        "إعدادات المنظومة",
-                        () -> showMessage(
-                                "إعدادات المنظومة"
-                        )
-                )
+                        "ℹ معلومات المنظومة",
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showMessage(
+                                        "منظومة إدارة القوة العمومية\n" +
+                                        "V7.1"
+                                );
+                            }
+                        }
+                ),
+                matchParams(8)
         );
 
-        setContentViewFromRoot();
+        root.addView(
+                createBackButton(),
+                matchParams(12)
+        );
+
+        setContentView(scrollView);
     }
 
     // =========================================================
-    // إنشاء الواجهة الأساسية
+    // UI HELPERS
     // =========================================================
 
-    private LinearLayout createBaseLayout() {
+    private void createScrollablePage() {
 
-        ScrollView scrollView =
-                new ScrollView(this);
-
+        scrollView = new ScrollView(this);
         scrollView.setFillViewport(true);
+        scrollView.setBackgroundColor(LIGHT);
 
-        LinearLayout container =
-                new LinearLayout(this);
-
-        container.setOrientation(
-                LinearLayout.VERTICAL
-        );
-
-        container.setPadding(
-                22,
-                25,
-                22,
-                30
-        );
-
-        container.setBackgroundColor(LIGHT);
+        root = new LinearLayout(this);
+        root.setOrientation(LinearLayout.VERTICAL);
+        root.setPadding(18, 18, 18, 25);
+        root.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
 
         scrollView.addView(
-                container,
+                root,
                 new ScrollView.LayoutParams(
                         ScrollView.LayoutParams.MATCH_PARENT,
                         ScrollView.LayoutParams.WRAP_CONTENT
                 )
         );
-
-        /*
-         * نحتفظ بالـLinearLayout الداخلي في root
-         * حتى نضيف إليه جميع العناصر.
-         */
-        root = container;
-
-        /*
-         * نحفظ الـScrollView كـTag حتى نستعمله
-         * عند setContentView.
-         */
-        root.setTag(scrollView);
-
-        return root;
     }
 
-    // =========================================================
-    // وضع الـScrollView فعلياً كواجهة التطبيق
-    // =========================================================
-
-    private void setContentViewFromRoot() {
-
-        Object tag = root.getTag();
-
-        if (tag instanceof ScrollView) {
-
-            ScrollView scrollView =
-                    (ScrollView) tag;
-
-            setContentView(scrollView);
-
-        } else {
-
-            setContentView(root);
-        }
-    }
-
-    // =========================================================
-    // زر الرجوع داخل الصفحات
-    // =========================================================
-
-    private void addBackButton() {
-
-        Button back =
-                createButton(
-                        "← رجوع إلى لوحة القيادة",
-                        DARK_GREEN
-                );
-
-        back.setOnClickListener(
-                v -> showDashboard()
-        );
-
-        LinearLayout.LayoutParams params =
-                new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        55
-                );
-
-        params.setMargins(
-                0,
-                0,
-                0,
-                15
-        );
-
-        root.addView(
-                back,
-                params
-        );
-    }
-
-    // =========================================================
-    // عنوان
-    // =========================================================
-
-    private TextView createTitle(
-            String text,
-            int size,
-            int color
+    private void addHeader(
+            String titleText,
+            String subtitleText
     ) {
 
-        TextView t =
-                new TextView(this);
+        LinearLayout header =
+                new LinearLayout(this);
 
-        t.setText(text);
-        t.setTextSize(size);
-        t.setTextColor(color);
-        t.setTypeface(
+        header.setOrientation(
+                LinearLayout.VERTICAL
+        );
+
+        header.setGravity(Gravity.CENTER);
+        header.setPadding(15, 22, 15, 22);
+        header.setBackground(
+                roundedBackground(
+                        DARK_GREEN,
+                        22
+                )
+        );
+
+        TextView title =
+                createText(
+                        titleText,
+                        25,
+                        WHITE
+                );
+
+        title.setTypeface(
                 null,
                 Typeface.BOLD
         );
 
-        t.setGravity(
+        title.setGravity(
                 Gravity.CENTER
         );
 
-        t.setPadding(
-                5,
+        header.addView(
+                title,
+                matchParams(2)
+        );
+
+        TextView subtitle =
+                createText(
+                        subtitleText,
+                        13,
+                        Color.rgb(225, 235, 228)
+                );
+
+        subtitle.setGravity(
+                Gravity.CENTER
+        );
+
+        header.addView(
+                subtitle,
+                matchParams(5)
+        );
+
+        root.addView(
+                header,
+                matchParams(10)
+        );
+    }
+
+    private TextView createSectionTitle(
+            String text
+    ) {
+
+        TextView view =
+                createText(
+                        text,
+                        19,
+                        DARK_GREEN
+                );
+
+        view.setTypeface(
+                null,
+                Typeface.BOLD
+        );
+
+        view.setPadding(
                 8,
-                5,
+                12,
+                8,
                 8
         );
 
-        return t;
+        return view;
     }
-
-    // =========================================================
-    // نص
-    // =========================================================
 
     private TextView createText(
             String text,
-            int size,
+            float size,
             int color
     ) {
 
-        TextView t =
+        TextView view =
                 new TextView(this);
 
-        t.setText(text);
-        t.setTextSize(size);
-        t.setTextColor(color);
+        view.setText(text);
+        view.setTextSize(size);
+        view.setTextColor(color);
+        view.setGravity(
+                Gravity.CENTER_VERTICAL
+        );
 
-        t.setPadding(
-                5,
+        return view;
+    }
+
+    private EditText createInput(
+            String hint
+    ) {
+
+        EditText input =
+                new EditText(this);
+
+        input.setHint(hint);
+        input.setTextSize(16);
+        input.setTextColor(DARK);
+        input.setHintTextColor(GRAY);
+        input.setSingleLine(true);
+        input.setPadding(
+                18,
+                12,
+                18,
+                12
+        );
+
+        input.setBackground(
+                roundedBackground(
+                        WHITE,
+                        16
+                )
+        );
+
+        return input;
+    }
+
+    private Button createMainButton(
+            String text
+    ) {
+
+        Button button =
+                new Button(this);
+
+        button.setText(text);
+        button.setTextSize(18);
+        button.setTextColor(WHITE);
+        button.setTypeface(
+                null,
+                Typeface.BOLD
+        );
+        button.setGravity(
+                Gravity.CENTER
+        );
+        button.setAllCaps(false);
+        button.setPadding(
+                10,
                 8,
-                5,
+                10,
                 8
         );
 
-        return t;
+        button.setBackground(
+                roundedBackground(
+                        GREEN,
+                        18
+                )
+        );
+
+        return button;
     }
 
-    // =========================================================
-    // كرت ملون
-    // =========================================================
+    private Button createDashboardButton(
+            String text,
+            View.OnClickListener listener
+    ) {
 
-    private LinearLayout createCard(
+        Button button =
+                createMainButton(text);
+
+        button.setTextSize(16);
+        button.setOnClickListener(listener);
+
+        return button;
+    }
+
+    private Button createBackButton() {
+
+        return createDashboardButton(
+                "↩ العودة إلى لوحة القيادة",
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showDashboard();
+                    }
+                }
+        );
+    }
+
+    private LinearLayout createStatCard(
+            String title,
+            String number,
+            String percentage,
             int color
     ) {
 
@@ -1337,28 +1504,289 @@ public class MainActivity extends Activity {
         );
 
         card.setPadding(
-                18,
-                15,
-                18,
-                15
+                8,
+                14,
+                8,
+                14
         );
 
-        GradientDrawable bg =
-                new GradientDrawable();
+        card.setBackground(
+                roundedBackground(
+                        WHITE,
+                        20
+                )
+        );
 
-        bg.setColor(color);
-        bg.setCornerRadius(28);
+        TextView t =
+                createText(
+                        title,
+                        15,
+                        color
+                );
 
-        card.setBackground(bg);
+        t.setTypeface(
+                null,
+                Typeface.BOLD
+        );
+        t.setGravity(Gravity.CENTER);
+
+        card.addView(
+                t,
+                matchParams(2)
+        );
+
+        TextView n =
+                createText(
+                        number,
+                        30,
+                        DARK
+                );
+
+        n.setTypeface(
+                null,
+                Typeface.BOLD
+        );
+        n.setGravity(Gravity.CENTER);
+
+        card.addView(
+                n,
+                matchParams(2)
+        );
+
+        TextView p =
+                createText(
+                        percentage,
+                        14,
+                        color
+                );
+
+        p.setTypeface(
+                null,
+                Typeface.BOLD
+        );
+        p.setGravity(Gravity.CENTER);
+
+        card.addView(
+                p,
+                matchParams(2)
+        );
 
         return card;
     }
 
-    // =========================================================
-    // كرت أبيض
-    // =========================================================
+    private LinearLayout createStatusCard(
+            String title,
+            String value,
+            int color
+    ) {
 
-    private LinearLayout createWhiteCard() {
+        LinearLayout card =
+                new LinearLayout(this);
+
+        card.setOrientation(
+                LinearLayout.HORIZONTAL
+        );
+
+        card.setGravity(
+                Gravity.CENTER_VERTICAL
+        );
+
+        card.setPadding(
+                16,
+                13,
+                16,
+                13
+        );
+
+        card.setBackground(
+                roundedBackground(
+                        WHITE,
+                        16
+                )
+        );
+
+        TextView titleView =
+                createText(
+                        title,
+                        16,
+                        DARK
+                );
+
+        titleView.setTypeface(
+                null,
+                Typeface.BOLD
+        );
+
+        TextView valueView =
+                createText(
+                        value,
+                        20,
+                        color
+                );
+
+        valueView.setTypeface(
+                null,
+                Typeface.BOLD
+        );
+
+        valueView.setGravity(
+                Gravity.CENTER
+        );
+
+        card.addView(
+                titleView,
+                new LinearLayout.LayoutParams(
+                        0,
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        1
+                )
+        );
+
+        card.addView(
+                valueView,
+                new LinearLayout.LayoutParams(
+                        90,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+        );
+
+        return card;
+    }
+
+    private LinearLayout createAlertCard(
+            String title,
+            String number,
+            int color
+    ) {
+
+        LinearLayout card =
+                new LinearLayout(this);
+
+        card.setOrientation(
+                LinearLayout.VERTICAL
+        );
+
+        card.setGravity(
+                Gravity.CENTER
+        );
+
+        card.setPadding(
+                8,
+                14,
+                8,
+                14
+        );
+
+        card.setBackground(
+                roundedBackground(
+                        WHITE,
+                        18
+                )
+        );
+
+        TextView numberView =
+                createText(
+                        number,
+                        29,
+                        color
+                );
+
+        numberView.setTypeface(
+                null,
+                Typeface.BOLD
+        );
+        numberView.setGravity(
+                Gravity.CENTER
+        );
+
+        card.addView(
+                numberView,
+                matchParams(2)
+        );
+
+        TextView titleView =
+                createText(
+                        title,
+                        14,
+                        DARK
+                );
+
+        titleView.setGravity(
+                Gravity.CENTER
+        );
+
+        card.addView(
+                titleView,
+                matchParams(2)
+        );
+
+        return card;
+    }
+
+    private LinearLayout createArchiveCard(
+            String title,
+            String description
+    ) {
+
+        LinearLayout card =
+                new LinearLayout(this);
+
+        card.setOrientation(
+                LinearLayout.VERTICAL
+        );
+
+        card.setPadding(
+                16,
+                14,
+                16,
+                14
+        );
+
+        card.setBackground(
+                roundedBackground(
+                        WHITE,
+                        18
+                )
+        );
+
+        TextView titleView =
+                createText(
+                        title,
+                        17,
+                        GREEN
+                );
+
+        titleView.setTypeface(
+                null,
+                Typeface.BOLD
+        );
+
+        card.addView(
+                titleView,
+                matchParams(2)
+        );
+
+        TextView descView =
+                createText(
+                        description,
+                        13,
+                        GRAY
+                );
+
+        card.addView(
+                descView,
+                matchParams(2)
+        );
+
+        return card;
+    }
+
+    private LinearLayout createPersonnelPreview(
+            String name,
+            String rank,
+            String department,
+            String status
+    ) {
 
         LinearLayout card =
                 new LinearLayout(this);
@@ -1369,189 +1797,256 @@ public class MainActivity extends Activity {
 
         card.setPadding(
                 18,
-                15,
                 18,
-                15
+                18,
+                18
         );
 
-        GradientDrawable bg =
-                new GradientDrawable();
-
-        bg.setColor(WHITE);
-        bg.setCornerRadius(22);
-        bg.setStroke(
-                1,
-                Color.rgb(225, 228, 226)
+        card.setBackground(
+                roundedBackground(
+                        WHITE,
+                        20
+                )
         );
 
-        card.setBackground(bg);
-
-        LinearLayout.LayoutParams params =
-                new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                );
-
-        params.setMargins(
-                0,
-                8,
-                0,
-                12
-        );
-
-        card.setLayoutParams(params);
-
-        /*
-         * مهم:
-         * هذه الدالة لا تضيف البطاقة إلى root.
-         * المستدعي هو الذي يضيفها.
-         */
-        return card;
-    }
-
-    // =========================================================
-    // عنوان قسم
-    // =========================================================
-
-    private TextView createSection(
-            String text
-    ) {
-
-        TextView t =
+        TextView nameView =
                 createText(
-                        text,
-                        18,
+                        "👤 " + name,
+                        20,
                         DARK_GREEN
                 );
 
-        t.setTypeface(
+        nameView.setTypeface(
                 null,
                 Typeface.BOLD
         );
 
-        t.setPadding(
-                5,
-                22,
-                5,
-                10
+        card.addView(
+                nameView,
+                matchParams(3)
         );
 
-        return t;
+        card.addView(
+                createDataRow(
+                        "الرتبة",
+                        rank
+                ),
+                matchParams(2)
+        );
+
+        card.addView(
+                createDataRow(
+                        "الجهة",
+                        department
+                ),
+                matchParams(2)
+        );
+
+        card.addView(
+                createDataRow(
+                        "الحالة",
+                        status
+                ),
+                matchParams(2)
+        );
+
+        return card;
     }
 
-    // =========================================================
-    // بطاقة إحصائية
-    // =========================================================
-
-    private LinearLayout createStatCard(
-            String title,
-            String number,
-            String percent,
-            int color
-    ) {
+    private LinearLayout createProfileCard() {
 
         LinearLayout card =
-                createCard(color);
+                new LinearLayout(this);
 
-        TextView titleView =
+        card.setOrientation(
+                LinearLayout.VERTICAL
+        );
+
+        card.setPadding(
+                18,
+                18,
+                18,
+                18
+        );
+
+        card.setBackground(
+                roundedBackground(
+                        WHITE,
+                        20
+                )
+        );
+
+        TextView title =
                 createText(
-                        title,
+                        "👤 عمران محمد مثال",
+                        22,
+                        DARK_GREEN
+                );
+
+        title.setTypeface(
+                null,
+                Typeface.BOLD
+        );
+
+        card.addView(
+                title,
+                matchParams(5)
+        );
+
+        card.addView(
+                createDataRow(
+                        "الرتبة",
+                        "رائد"
+                ),
+                matchParams(2)
+        );
+
+        card.addView(
+                createDataRow(
+                        "الرقم العسكري",
+                        "001250"
+                ),
+                matchParams(2)
+        );
+
+        card.addView(
+                createDataRow(
+                        "الرقم الوطني",
+                        "غير مدخل"
+                ),
+                matchParams(2)
+        );
+
+        card.addView(
+                createDataRow(
+                        "الفرع",
+                        "القوة العمومية"
+                ),
+                matchParams(2)
+        );
+
+        card.addView(
+                createDataRow(
+                        "الحالة",
+                        "مستمر"
+                ),
+                matchParams(2)
+        );
+
+        return card;
+    }
+
+    private LinearLayout createMiniFinancialCard() {
+
+        LinearLayout card =
+                new LinearLayout(this);
+
+        card.setOrientation(
+                LinearLayout.VERTICAL
+        );
+
+        card.setPadding(
+                18,
+                18,
+                18,
+                18
+        );
+
+        card.setBackground(
+                roundedBackground(
+                        DARK_GREEN,
+                        20
+                )
+        );
+
+        TextView title =
+                createText(
+                        "💳 البطاقة المالية",
+                        20,
+                        WHITE
+                );
+
+        title.setTypeface(
+                null,
+                Typeface.BOLD
+        );
+
+        card.addView(
+                title,
+                matchParams(4)
+        );
+
+        TextView data =
+                createText(
+                        "الرقم المالي: FIN-001250\n" +
+                        "المصرف: مصرف الجمهورية\n" +
+                        "الفرع: بنغازي\n" +
+                        "الحالة: مرتب جاري",
                         15,
-                        WHITE
+                        Color.rgb(230, 240, 232)
                 );
 
-        titleView.setGravity(
-                Gravity.CENTER
+        card.addView(
+                data,
+                matchParams(4)
         );
-
-        TextView numberView =
-                createText(
-                        number,
-                        27,
-                        WHITE
-                );
-
-        numberView.setTypeface(
-                null,
-                Typeface.BOLD
-        );
-
-        numberView.setGravity(
-                Gravity.CENTER
-        );
-
-        TextView percentView =
-                createText(
-                        percent,
-                        14,
-                        WHITE
-                );
-
-        percentView.setGravity(
-                Gravity.CENTER
-        );
-
-        card.addView(titleView);
-        card.addView(numberView);
-        card.addView(percentView);
 
         return card;
     }
 
-    // =========================================================
-    // بطاقة صغيرة
-    // =========================================================
-
-    private LinearLayout createMiniCard(
-            String title,
-            String number,
-            int color
-    ) {
+    private LinearLayout createMovementSummary() {
 
         LinearLayout card =
-                createCard(color);
+                new LinearLayout(this);
 
-        TextView titleView =
-                createText(
-                        title,
-                        12,
-                        WHITE
-                );
-
-        titleView.setGravity(
-                Gravity.CENTER
+        card.setOrientation(
+                LinearLayout.VERTICAL
         );
 
-        TextView numberView =
-                createText(
-                        number,
-                        25,
-                        WHITE
-                );
-
-        numberView.setTypeface(
-                null,
-                Typeface.BOLD
+        card.setPadding(
+                16,
+                16,
+                16,
+                16
         );
 
-        numberView.setGravity(
-                Gravity.CENTER
+        card.setBackground(
+                roundedBackground(
+                        WHITE,
+                        18
+                )
         );
 
-        card.addView(titleView);
-        card.addView(numberView);
+        card.addView(
+                createDataRow(
+                        "نوع التكليف",
+                        "انتداب"
+                ),
+                matchParams(2)
+        );
+
+        card.addView(
+                createDataRow(
+                        "الاتجاه",
+                        "إلينا"
+                ),
+                matchParams(2)
+        );
+
+        card.addView(
+                createDataRow(
+                        "الجهة",
+                        "جهة أمنية"
+                ),
+                matchParams(2)
+        );
 
         return card;
     }
 
-    // =========================================================
-    // صف حالة
-    // =========================================================
-
-    private LinearLayout createStatusRow(
-            String title,
-            String value,
-            int color
+    private LinearLayout createDataRow(
+            String label,
+            String value
     ) {
 
         LinearLayout row =
@@ -1566,37 +2061,33 @@ public class MainActivity extends Activity {
         );
 
         row.setPadding(
-                8,
                 12,
                 8,
-                12
+                12,
+                8
         );
 
-        TextView name =
+        TextView labelView =
                 createText(
-                        title,
+                        label,
+                        14,
+                        GRAY
+                );
+
+        TextView valueView =
+                createText(
+                        value,
                         15,
                         DARK
                 );
 
-        TextView number =
-                createText(
-                        value,
-                        16,
-                        color
-                );
-
-        number.setTypeface(
+        valueView.setTypeface(
                 null,
                 Typeface.BOLD
         );
 
-        number.setGravity(
-                Gravity.CENTER
-        );
-
         row.addView(
-                name,
+                labelView,
                 new LinearLayout.LayoutParams(
                         0,
                         LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -1605,10 +2096,11 @@ public class MainActivity extends Activity {
         );
 
         row.addView(
-                number,
+                valueView,
                 new LinearLayout.LayoutParams(
-                        80,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
+                        0,
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        1
                 )
         );
 
@@ -1616,220 +2108,165 @@ public class MainActivity extends Activity {
     }
 
     // =========================================================
-    // زر لوحة القيادة
+    // 116 FIELDS
     // =========================================================
 
-    private Button createDashboardButton(
-            String text,
-            final Runnable action
-    ) {
+    private String[] getAll116Fields() {
 
-        Button button =
-                createButton(
-                        text,
-                        WHITE
-                );
+        return new String[] {
 
-        button.setTextColor(
-                DARK_GREEN
-        );
-
-        button.setGravity(
-                Gravity.CENTER_VERTICAL |
-                Gravity.RIGHT
-        );
-
-        button.setOnClickListener(
-                v -> action.run()
-        );
-
-        LinearLayout.LayoutParams params =
-                new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        60
-                );
-
-        params.setMargins(
-                0,
-                5,
-                0,
-                5
-        );
-
-        button.setLayoutParams(params);
-
-        return button;
+                "معرّف السجل",
+                "الاسم الثلاثي",
+                "الرتبة",
+                "اللقب",
+                "الفرع",
+                "اسم الأب",
+                "اسم الأم",
+                "الصفة الوظيفية",
+                "الرقم الوطني",
+                "رقم ورقة العائلة",
+                "الرقم الحسابي",
+                "حالة الزواج",
+                "اسم الزوج/ة",
+                "عدد الأبناء",
+                "فصيلة الدم",
+                "قياس البدلة",
+                "قياس الحذاء",
+                "مدينة الإقامة",
+                "رقم الهاتف",
+                "رقم البطاقة الشخصية",
+                "رقم جواز السفر",
+                "الخبرات والسيرة",
+                "اللغات المتقنة",
+                "رقم القرار والتعيين",
+                "تاريخ قرار التعيين",
+                "رقم آخر ترقية",
+                "تاريخ آخر ترقية",
+                "سجل الترقيات السابقة",
+                "تاريخ بداية الانتداب/التكليف",
+                "تاريخ انتهاء الانتداب/التكليف",
+                "الحالة العسكرية الحالية",
+                "الملاحظات والقيود",
+                "تاريخ الميلاد",
+                "العمر",
+                "مكان الميلاد",
+                "العنوان التفصيلي",
+                "رقم الهاتف البديل",
+                "جهة الاتصال في الطوارئ",
+                "رقم الطوارئ",
+                "الوحدة/القطاع",
+                "الدرجة الوظيفية",
+                "الرتبة السابقة",
+                "رقم قرار الترقية",
+                "تاريخ قرار الترقية",
+                "جهة قرار الترقية",
+                "نوع التكليف",
+                "جهة التكليف",
+                "مكان التكليف",
+                "تاريخ بداية التكليف",
+                "تاريخ نهاية التكليف",
+                "رقم قرار التكليف",
+                "حالة التكليف",
+                "نوع الدورة",
+                "اسم الدورة",
+                "الجهة التدريبية",
+                "الدولة",
+                "تاريخ بداية الدورة",
+                "تاريخ نهاية الدورة",
+                "المستوى/التقدير",
+                "رقم الشهادة",
+                "المؤهل",
+                "التخصص",
+                "الجهة التعليمية",
+                "دولة التخرج",
+                "سنة التخرج",
+                "التقدير",
+                "اللغة 1",
+                "مستوى القراءة 1",
+                "مستوى الكتابة 1",
+                "مستوى المحادثة 1",
+                "اللغة 2",
+                "مستوى القراءة 2",
+                "مستوى الكتابة 2",
+                "مستوى المحادثة 2",
+                "نوع الوثيقة",
+                "رقم الوثيقة",
+                "تاريخ الوثيقة",
+                "تاريخ انتهاء الوثيقة",
+                "الجهة المصدرة",
+                "حالة الوثيقة",
+                "حالة التنبيه",
+                "نص التنبيه",
+                "تاريخ التنبيه",
+                "يوم متبقي",
+                "تاريخ الاستحقاق القادم للترقية",
+                "المدة المتبقية للترقية",
+                "حالة تنبيه الترقية",
+                "الأنواط والأوسمة",
+                "عدد الترقيات الاستثنائية",
+                "أرقام قرارات الترقية الاستثنائية",
+                "لفت النظر شفاهي",
+                "لفت النظر كتابي",
+                "إنذار شفاهي",
+                "إنذار كتابي",
+                "عدد إسقاط رتبة",
+                "صحائف الاتهام",
+                "محاضر التحقيق الإداري",
+                "الإجازات المرضية",
+                "الجرحى والمصابين",
+                "تاريخ الإصابة",
+                "الشهداء",
+                "تاريخ الاستشهاد",
+                "رسائل الشكر",
+                "نقاط الإيجابيات",
+                "نقاط السلبيات",
+                "النسبة المئوية للتقييم السنوي",
+                "التقدير السنوي",
+                "مسار/رابط الصورة الشخصية",
+                "مشاركة في خطط أمنية",
+                "قبض على قضايا",
+                "عدد القضايا",
+                "حسن سيرة وسلوك",
+                "السلاح",
+                "الجهاز اللاسلكي",
+                "المركبة",
+                "معدات أخرى"
+        };
     }
 
     // =========================================================
-    // زر عام
+    // FOOTER
     // =========================================================
 
-    private Button createButton(
-            String text,
-            int color
-    ) {
+    private void addFooter() {
 
-        Button button =
-                new Button(this);
-
-        button.setText(text);
-        button.setTextSize(16);
-
-        button.setTypeface(
-                null,
-                Typeface.BOLD
-        );
-
-        button.setAllCaps(false);
-
-        if (color == WHITE) {
-
-            button.setTextColor(DARK);
-
-        } else {
-
-            button.setTextColor(WHITE);
-        }
-
-        GradientDrawable bg =
-                new GradientDrawable();
-
-        bg.setColor(color);
-        bg.setCornerRadius(18);
-
-        if (color == WHITE) {
-
-            bg.setStroke(
-                    1,
-                    Color.rgb(220, 225, 222)
-            );
-        }
-
-        button.setBackground(bg);
-
-        return button;
-    }
-
-    // =========================================================
-    // بطاقة معلومات
-    // =========================================================
-
-    private LinearLayout createInfoCard(
-            String title,
-            String value
-    ) {
-
-        LinearLayout card =
-                createWhiteCard();
-
-        TextView titleView =
+        TextView footer =
                 createText(
-                        title,
-                        14,
+                        "منظومة إدارة القوة العمومية V7.1\n" +
+                        "رئاسة جهاز مكافحة الهجرة غير الشرعية",
+                        12,
                         GRAY
                 );
 
-        TextView valueView =
-                createText(
-                        value,
-                        18,
-                        DARK_GREEN
-                );
-
-        valueView.setTypeface(
-                null,
-                Typeface.BOLD
+        footer.setGravity(
+                Gravity.CENTER
         );
 
-        card.addView(titleView);
-        card.addView(valueView);
+        footer.setPadding(
+                10,
+                25,
+                10,
+                15
+        );
 
-        return card;
+        root.addView(
+                footer,
+                matchParams(10)
+        );
     }
 
     // =========================================================
-    // عنصر الأرشيف
-    // =========================================================
-
-    private TextView createArchiveItem(
-            String icon,
-            String text
-    ) {
-
-        TextView item =
-                createText(
-                        icon + "    " + text,
-                        16,
-                        DARK
-                );
-
-        item.setPadding(
-                12,
-                16,
-                12,
-                16
-        );
-
-        item.setOnClickListener(
-                v -> showMessage(
-                        "الأرشيف: " + text
-                )
-        );
-
-        return item;
-    }
-
-    // =========================================================
-    // معاملات صف الإحصائيات
-    // =========================================================
-
-    private LinearLayout.LayoutParams
-    createWeightParams() {
-
-        LinearLayout.LayoutParams params =
-                new LinearLayout.LayoutParams(
-                        0,
-                        125,
-                        1
-                );
-
-        params.setMargins(
-                5,
-                5,
-                5,
-                5
-        );
-
-        return params;
-    }
-
-    // =========================================================
-    // معاملات البطاقات الصغيرة
-    // =========================================================
-
-    private LinearLayout.LayoutParams
-    createMiniWeightParams() {
-
-        LinearLayout.LayoutParams params =
-                new LinearLayout.LayoutParams(
-                        0,
-                        105,
-                        1
-                );
-
-        params.setMargins(
-                3,
-                3,
-                3,
-                3
-        );
-
-        return params;
-    }
-
-    // =========================================================
-    // رسالة
+    // BACK / MESSAGE
     // =========================================================
 
     private void showMessage(
@@ -1839,7 +2276,64 @@ public class MainActivity extends Activity {
         Toast.makeText(
                 this,
                 message,
-                Toast.LENGTH_SHORT
+                Toast.LENGTH_LONG
         ).show();
+    }
+
+    // =========================================================
+    // LAYOUT HELPERS
+    // =========================================================
+
+    private LinearLayout.LayoutParams matchParams(
+            int topMargin
+    ) {
+
+        LinearLayout.LayoutParams params =
+                new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                );
+
+        params.setMargins(
+                0,
+                topMargin,
+                0,
+                0
+        );
+
+        return params;
+    }
+
+    private LinearLayout.LayoutParams weightParams() {
+
+        LinearLayout.LayoutParams params =
+                new LinearLayout.LayoutParams(
+                        0,
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        1
+                );
+
+        params.setMargins(
+                5,
+                5,
+                5,
+                5
+        );
+
+        return params;
+    }
+
+    private GradientDrawable roundedBackground(
+            int color,
+            int radius
+    ) {
+
+        GradientDrawable drawable =
+                new GradientDrawable();
+
+        drawable.setColor(color);
+        drawable.setCornerRadius(radius);
+
+        return drawable;
     }
 }
