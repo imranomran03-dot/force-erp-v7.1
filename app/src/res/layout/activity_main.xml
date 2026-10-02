@@ -1,45 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4F6F5"
-    android:layoutDirection="rtl">
+    android:background="#F5F7F6"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="14dp"
+        android:layoutDirection="rtl">
 
-        <!-- HEADER -->
-
+        <!-- رأس لوحة القيادة -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="125dp"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="12dp"
-            android:background="#176B3A">
+            android:background="#1B5E20"
+            android:padding="20dp">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="رئاسة جهاز مكافحة الهجرة غير الشرعية"
                 android:textColor="#FFFFFF"
-                android:textSize="21sp"
+                android:textSize="20sp"
                 android:textStyle="bold"
-                android:gravity="center"/>
+                android:gravity="center" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="منظومة إدارة القوة العمومية V7.1"
                 android:textColor="#E8F5E9"
-                android:textSize="18sp"
+                android:textSize="17sp"
                 android:gravity="center"
-                android:layout_marginTop="8dp"/>
+                android:paddingTop="6dp" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -48,620 +46,508 @@
                 android:textColor="#FFFFFF"
                 android:textSize="15sp"
                 android:gravity="center"
-                android:layout_marginTop="6dp"/>
+                android:paddingTop="8dp" />
 
         </LinearLayout>
 
-
-        <!-- TOTAL FORCE -->
-
+        <!-- إجمالي القوة -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="125dp"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
-            android:layout_marginTop="12dp"
             android:background="#FFFFFF"
-            android:elevation="4dp">
+            android:padding="18dp"
+            android:layout_marginTop="12dp">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="إجمالي القوة العمومية"
+                android:text="إجمالي القوة"
                 android:textColor="#555555"
-                android:textSize="18sp"
-                android:gravity="center"/>
+                android:textSize="16sp"
+                android:gravity="center" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="1,250"
-                android:textColor="#176B3A"
+                android:textColor="#1B5E20"
                 android:textSize="38sp"
                 android:textStyle="bold"
                 android:gravity="center"
-                android:layout_marginTop="4dp"/>
+                android:paddingTop="4dp" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="منتسب"
+                android:text="منتسب وموظف"
                 android:textColor="#777777"
                 android:textSize="14sp"
-                android:gravity="center"/>
+                android:gravity="center" />
 
         </LinearLayout>
 
-
-        <!-- FORCE CATEGORIES -->
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="توزيع القوة"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#176B3A"
-            android:layout_marginTop="18dp"
-            android:layout_marginBottom="8dp"/>
-
-
+        <!-- الفئات الرئيسية -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="115dp"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:layout_marginTop="12dp"
             android:weightSum="2">
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:layout_margin="4dp"
                 android:background="#FFFFFF"
-                android:elevation="3dp">
+                android:padding="14dp"
+                android:layout_marginEnd="6dp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="الضباط"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textStyle="bold"
-                    android:textColor="#176B3A"
-                    android:gravity="center"/>
+                    android:textColor="#333333"
+                    android:gravity="center" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="180"
-                    android:textSize="30sp"
+                    android:textSize="27sp"
                     android:textStyle="bold"
+                    android:textColor="#1B5E20"
                     android:gravity="center"
-                    android:textColor="#222222"/>
+                    android:paddingTop="5dp" />
 
             </LinearLayout>
 
-
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:layout_margin="4dp"
                 android:background="#FFFFFF"
-                android:elevation="3dp">
+                android:padding="14dp"
+                android:layout_marginStart="6dp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="ضباط الصف"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textStyle="bold"
-                    android:textColor="#176B3A"
-                    android:gravity="center"/>
+                    android:textColor="#333333"
+                    android:gravity="center" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="420"
-                    android:textSize="30sp"
+                    android:textSize="27sp"
                     android:textStyle="bold"
+                    android:textColor="#1B5E20"
                     android:gravity="center"
-                    android:textColor="#222222"/>
+                    android:paddingTop="5dp" />
 
             </LinearLayout>
 
         </LinearLayout>
 
-
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="115dp"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:layout_marginTop="10dp"
             android:weightSum="2">
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:layout_margin="4dp"
                 android:background="#FFFFFF"
-                android:elevation="3dp">
+                android:padding="14dp"
+                android:layout_marginEnd="6dp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="الأفراد"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textStyle="bold"
-                    android:textColor="#176B3A"
-                    android:gravity="center"/>
+                    android:textColor="#333333"
+                    android:gravity="center" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="530"
-                    android:textSize="30sp"
+                    android:textSize="27sp"
                     android:textStyle="bold"
+                    android:textColor="#1B5E20"
                     android:gravity="center"
-                    android:textColor="#222222"/>
+                    android:paddingTop="5dp" />
 
             </LinearLayout>
 
-
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:layout_margin="4dp"
                 android:background="#FFFFFF"
-                android:elevation="3dp">
+                android:padding="14dp"
+                android:layout_marginStart="6dp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="الموظفون"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textStyle="bold"
-                    android:textColor="#176B3A"
-                    android:gravity="center"/>
+                    android:textColor="#333333"
+                    android:gravity="center" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="120"
-                    android:textSize="30sp"
+                    android:textSize="27sp"
                     android:textStyle="bold"
+                    android:textColor="#1B5E20"
                     android:gravity="center"
-                    android:textColor="#222222"/>
+                    android:paddingTop="5dp" />
 
             </LinearLayout>
 
         </LinearLayout>
 
-
-        <!-- CURRENT STATUS -->
-
+        <!-- الموقف الحالي -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="الموقف الحالي"
-            android:textSize="20sp"
+            android:textSize="19sp"
             android:textStyle="bold"
-            android:textColor="#176B3A"
-            android:layout_marginTop="18dp"
-            android:layout_marginBottom="8dp"/>
-
+            android:textColor="#222222"
+            android:paddingTop="22dp"
+            android:paddingBottom="8dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:background="#FFFFFF"
-            android:padding="12dp"
-            android:elevation="3dp">
+            android:padding="15dp">
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="42dp"
+                android:layout_height="wrap_content"
                 android:text="مستمرون     82%"
                 android:textSize="16sp"
+                android:textColor="#1B5E20"
                 android:textStyle="bold"
-                android:gravity="center_vertical"
-                android:textColor="#176B3A"/>
+                android:padding="6dp" />
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="42dp"
-                android:text="مكلفون        8%"
+                android:layout_height="wrap_content"
+                android:text="مكلفون       8%"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                android:gravity="center_vertical"
-                android:textColor="#555555"/>
+                android:textColor="#555555"
+                android:padding="6dp" />
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="42dp"
-                android:text="منتدبون       4%"
+                android:layout_height="wrap_content"
+                android:text="منتدبون      4%"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                android:gravity="center_vertical"
-                android:textColor="#555555"/>
+                android:textColor="#555555"
+                android:padding="6dp" />
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="42dp"
-                android:text="موقوفون       2%"
+                android:layout_height="wrap_content"
+                android:text="موقوفون     2%"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                android:gravity="center_vertical"
-                android:textColor="#B3261E"/>
+                android:textColor="#B71C1C"
+                android:padding="6dp" />
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="42dp"
-                android:text="إجازة          3%"
+                android:layout_height="wrap_content"
+                android:text="إجازة         3%"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                android:gravity="center_vertical"
-                android:textColor="#777777"/>
+                android:textColor="#555555"
+                android:padding="6dp" />
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="42dp"
-                android:text="دورات          6%"
+                android:layout_height="wrap_content"
+                android:text="دورات        6%"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                android:gravity="center_vertical"
-                android:textColor="#777777"/>
+                android:textColor="#555555"
+                android:padding="6dp" />
 
         </LinearLayout>
 
-
-        <!-- ADMINISTRATIVE STRUCTURE -->
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="الهيكل الإداري"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#176B3A"
-            android:layout_marginTop="18dp"
-            android:layout_marginBottom="8dp"/>
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="75dp"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:weightSum="10">
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"/>
-
-            <TextView
-                android:id="@+id/btnOffices"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="8"
-                android:text="الإدارات"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF"
-                android:gravity="center"
-                android:background="#176B3A"/>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"/>
-
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:weightSum="10"
-            android:layout_marginTop="6dp">
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2"/>
-
-            <TextView
-                android:id="@+id/btnUnits"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="6"
-                android:text="المكاتب"
-                android:textSize="19sp"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF"
-                android:gravity="center"
-                android:background="#2E7D52"/>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2"/>
-
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="65dp"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:weightSum="10"
-            android:layout_marginTop="6dp">
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="3"/>
-
-            <TextView
-                android:id="@+id/btnStructurePersonnel"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="4"
-                android:text="الوحدات"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF"
-                android:gravity="center"
-                android:background="#4A9469"/>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="3"/>
-
-        </LinearLayout>
-
-
-        <!-- ALERTS -->
-
+        <!-- المؤشرات والتنبيهات -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="المؤشرات والتنبيهات"
-            android:textSize="20sp"
+            android:textSize="19sp"
             android:textStyle="bold"
-            android:textColor="#176B3A"
-            android:layout_marginTop="18dp"
-            android:layout_marginBottom="8dp"/>
-
+            android:textColor="#222222"
+            android:paddingTop="22dp"
+            android:paddingBottom="8dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="105dp"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:weightSum="2">
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center"
                 android:orientation="vertical"
-                android:layout_margin="4dp"
-                android:background="#FFF3CD">
+                android:gravity="center"
+                android:background="#FFF3E0"
+                android:padding="14dp"
+                android:layout_marginEnd="6dp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="تنبيهات"
                     android:textSize="15sp"
-                    android:gravity="center"/>
+                    android:textStyle="bold"
+                    android:textColor="#E65100"
+                    android:gravity="center" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="24"
-                    android:textSize="30sp"
+                    android:textSize="28sp"
                     android:textStyle="bold"
-                    android:textColor="#9A6700"
-                    android:gravity="center"/>
+                    android:textColor="#E65100"
+                    android:gravity="center" />
 
             </LinearLayout>
 
-
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center"
                 android:orientation="vertical"
-                android:layout_margin="4dp"
-                android:background="#FDECEC">
+                android:gravity="center"
+                android:background="#FFEBEE"
+                android:padding="14dp"
+                android:layout_marginStart="6dp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="بيانات ناقصة"
                     android:textSize="15sp"
-                    android:gravity="center"/>
+                    android:textStyle="bold"
+                    android:textColor="#B71C1C"
+                    android:gravity="center" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="17"
-                    android:textSize="30sp"
+                    android:textSize="28sp"
                     android:textStyle="bold"
-                    android:textColor="#B3261E"
-                    android:gravity="center"/>
+                    android:textColor="#B71C1C"
+                    android:gravity="center" />
 
             </LinearLayout>
 
         </LinearLayout>
 
-
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="105dp"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:layout_marginTop="10dp"
             android:weightSum="2">
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center"
                 android:orientation="vertical"
-                android:layout_margin="4dp"
-                android:background="#E8F5E9">
+                android:gravity="center"
+                android:background="#E8F5E9"
+                android:padding="14dp"
+                android:layout_marginEnd="6dp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="ترقيات قريبة"
                     android:textSize="15sp"
-                    android:gravity="center"/>
+                    android:textStyle="bold"
+                    android:textColor="#1B5E20"
+                    android:gravity="center" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="9"
-                    android:textSize="30sp"
+                    android:textSize="28sp"
                     android:textStyle="bold"
-                    android:textColor="#176B3A"
-                    android:gravity="center"/>
+                    android:textColor="#1B5E20"
+                    android:gravity="center" />
 
             </LinearLayout>
 
-
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center"
                 android:orientation="vertical"
-                android:layout_margin="4dp"
-                android:background="#E3F2FD">
+                android:gravity="center"
+                android:background="#E3F2FD"
+                android:padding="14dp"
+                android:layout_marginStart="6dp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="قرارات قريبة"
                     android:textSize="15sp"
-                    android:gravity="center"/>
+                    android:textStyle="bold"
+                    android:textColor="#1565C0"
+                    android:gravity="center" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="6"
-                    android:textSize="30sp"
+                    android:textSize="28sp"
                     android:textStyle="bold"
                     android:textColor="#1565C0"
-                    android:gravity="center"/>
+                    android:gravity="center" />
 
             </LinearLayout>
 
         </LinearLayout>
 
-
-        <!-- QUICK ACCESS -->
-
+        <!-- الوصول السريع -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="الوصول السريع"
-            android:textSize="20sp"
+            android:textSize="19sp"
             android:textStyle="bold"
-            android:textColor="#176B3A"
-            android:layout_marginTop="18dp"
-            android:layout_marginBottom="8dp"/>
-
+            android:textColor="#222222"
+            android:paddingTop="22dp"
+            android:paddingBottom="8dp" />
 
         <Button
             android:id="@+id/btnPersonnel"
             android:layout_width="match_parent"
-            android:layout_height="58dp"
+            android:layout_height="55dp"
             android:text="👥  المنتسبون"
-            android:textSize="17sp"
-            android:layout_marginTop="4dp"/>
-
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/btnSearch"
             android:layout_width="match_parent"
-            android:layout_height="58dp"
+            android:layout_height="55dp"
             android:text="🔎  البحث عن منتسب"
-            android:textSize="17sp"
-            android:layout_marginTop="6dp"/>
-
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/btnReports"
             android:layout_width="match_parent"
-            android:layout_height="58dp"
+            android:layout_height="55dp"
             android:text="📊  التقارير والإحصائيات"
-            android:textSize="17sp"
-            android:layout_marginTop="6dp"/>
-
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/btnFinancial"
             android:layout_width="match_parent"
-            android:layout_height="58dp"
+            android:layout_height="55dp"
             android:text="💰  البطاقة المالية"
-            android:textSize="17sp"
-            android:layout_marginTop="6dp"/>
-
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/btnCourses"
             android:layout_width="match_parent"
-            android:layout_height="58dp"
+            android:layout_height="55dp"
             android:text="🎓  الدورات والمؤهلات"
-            android:textSize="17sp"
-            android:layout_marginTop="6dp"/>
-
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/btnMovement"
             android:layout_width="match_parent"
-            android:layout_height="58dp"
+            android:layout_height="55dp"
             android:text="🔄  الحركة والتنقلات"
-            android:textSize="17sp"
-            android:layout_marginTop="6dp"/>
-
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/btnSettings"
             android:layout_width="match_parent"
-            android:layout_height="58dp"
+            android:layout_height="55dp"
             android:text="⚙  الإعدادات"
-            android:textSize="17sp"
-            android:layout_marginTop="6dp"/>
+            android:textSize="16sp" />
 
+        <!-- الأرشيف -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#FFFFFF"
+            android:padding="18dp"
+            android:layout_marginTop="14dp">
 
-        <!-- FOOTER -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="الأرشيف الإلكتروني"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:gravity="center" />
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="قرارات • ملفات المنتسبين • الشهادات • المستندات"
+                android:textSize="14sp"
+                android:textColor="#777777"
+                android:gravity="center"
+                android:paddingTop="6dp" />
+
+        </LinearLayout>
+
+        <!-- التذييل -->
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="90dp"
+            android:layout_height="wrap_content"
             android:text="رئاسة جهاز مكافحة الهجرة غير الشرعية&#10;Force ERP • V7.1"
-            android:textSize="14sp"
+            android:textSize="13sp"
             android:textColor="#777777"
             android:gravity="center"
-            android:layout_marginTop="18dp"/>
+            android:paddingTop="24dp"
+            android:paddingBottom="20dp" />
 
     </LinearLayout>
 
