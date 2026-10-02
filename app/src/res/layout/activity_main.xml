@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F4F6F5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- رأس النظام -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingBottom="14dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="رئاسة قوة العمومية"
+                android:textColor="#174D2A"
+                android:textSize="23sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🔔"
+                android:textSize="25sp"
+                android:padding="8dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⚙"
+                android:textSize="25sp"
+                android:padding="8dp"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="منظومة إدارة القوة العمومية V7.1"
+            android:textColor="#666666"
+            android:textSize="15sp"
+            android:gravity="center"
+            android:paddingBottom="18dp"/>
+
+
+        <!-- إجمالي القوة -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="210dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#FFFFFF"
+            android:elevation="7dp"
+            android:padding="15dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="إجمالي القوة"
+                android:textColor="#555555"
+                android:textSize="18sp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1,250"
+                android:textColor="#174D2A"
+                android:textSize="48sp"
+                android:textStyle="bold"
+                android:paddingTop="5dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="منتسبًا"
+                android:textColor="#777777"
+                android:textSize="15sp"/>
+
+        </LinearLayout>
+
+
+        <!-- عنوان التوزيع -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="توزيع القوة"
+            android:textColor="#222222"
+            android:textSize="21sp"
+            android:textStyle="bold"
+            android:paddingTop="24dp"
+            android:paddingBottom="12dp"/>
+
+
+        <!-- الدوائر -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="145dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="#FFFFFF"
+                android:elevation="5dp"
+                android:layout_margin="5dp">
+
+                <TextView
+                    android:layout_width="85dp"
+                    android:layout_height="85dp"
+                    android:gravity="center"
+                    android:text="180"
+                    android:textColor="#174D2A"
+                    android:textSize="25sp"
+                    android:textStyle="bold"
+                    android:background="#DCEFE2"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="الضباط"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:paddingTop="7dp"/>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="145dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="#FFFFFF"
+                android:elevation="5dp"
+                android:layout_margin="5dp">
+
+                <TextView
+                    android:layout_width="85dp"
+                    android:layout_height="85dp"
+                    android:gravity="center"
+                    android:text="420"
+                    android:textColor="#315A87"
+                    android:textSize="25sp"
+                    android:textStyle="bold"
+                    android:background="#DDE8F5"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ضباط الصف"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:paddingTop="7dp"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="145dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="#FFFFFF"
+                android:elevation="5dp"
+                android:layout_margin="5dp">
+
+                <TextView
+                    android:layout_width="85dp"
+                    android:layout_height="85dp"
+                    android:gravity="center"
+                    android:text="530"
+                    android:textColor="#8A5A18"
+                    android:textSize="25sp"
+                    android:textStyle="bold"
+                    android:background="#F5E8CB"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="الأفراد"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:paddingTop="7dp"/>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="145dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="#FFFFFF"
+                android:elevation="5dp"
+                android:layout_margin="5dp">
+
+                <TextView
+                    android:layout_width="85dp"
+                    android:layout_height="85dp"
+                    android:gravity="center"
+                    android:text="120"
+                    android:textColor="#654A7A"
+                    android:textSize="25sp"
+                    android:textStyle="bold"
+                    android:background="#E9DFF0"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="الموظفون"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:paddingTop="7dp"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <!-- الوصول السريع -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="الوصول السريع"
+            android:textColor="#222222"
+            android:textSize="21sp"
+            android:textStyle="bold"
+            android:paddingTop="25dp"
+            android:paddingBottom="10dp"/>
+
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:text="👥  المنتسبون"
+            android:textSize="17sp"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:text="🔎  البحث عن منتسب"
+            android:textSize="17sp"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:text="📊  التقارير والإحصائيات"
+            android:textSize="17sp"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:text="💰  البطاقة المالية"
+            android:textSize="17sp"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:text="🎓  الدورات والمؤهلات"
+            android:textSize="17sp"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:text="🔄  الحركة والتنقلات"
+            android:textSize="17sp"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:text="⚙  الإعدادات"
+            android:textSize="17sp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Force ERP • V7.1"
+            android:textColor="#888888"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:paddingTop="25dp"
+            android:paddingBottom="10dp"/>
+
+    </LinearLayout>
+
+</ScrollView>
