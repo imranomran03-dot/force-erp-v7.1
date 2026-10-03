@@ -4,44 +4,66 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 public class MainActivity extends Activity {
 
-    private ForceDatabase database;
-    private ExecutorService executor;
+    private PersonnelRepository repository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
-        database = DatabaseProvider.getDatabase(this);
-        executor = Executors.newSingleThreadExecutor();
+        ForceDatabase database =
+                DatabaseProvider.getDatabase(this);
+
+        repository = new PersonnelRepository(database);
 
         loadDashboard();
     }
 
     private void loadDashboard() {
 
-        executor.execute(() -> {
+        repository.getAll(personnelList -> {
 
-            PersonnelDao dao = database.personnelDao();
+            int total = personnelList.size();
 
-            int total = dao.getTotalCount();
-            int officers = dao.getOfficersCount();
-            int ncos = dao.getNonCommissionedOfficersCount();
-            int individuals = dao.getIndividualsCount();
-            int employees = dao.getEmployeesCount();
+            int officers = 0;
+            int ncos = 0;
+            int individuals = 0;
+            int employees = 0;
+
+            for (Personnel person : personnelList) {
+
+                if ("ضابط".equals(person.jobStatus)) {
+                    officers++;
+                }
+
+                if ("ضابط صف".equals(person.jobStatus)) {
+                    ncos++;
+                }
+
+                if ("فرد".equals(person.jobStatus)) {
+                    individuals++;
+                }
+
+                if ("موظف".equals(person.jobStatus)) {
+                    employees++;
+                }
+            }
+
+            final int finalOfficers = officers;
+            final int finalNcos = ncos;
+            final int finalIndividuals = individuals;
+            final int finalEmployees = employees;
 
             runOnUiThread(() -> {
 
                 setCount(R.id.txtTotal, total);
-                setCount(R.id.txtOfficers, officers);
-                setCount(R.id.txtNcos, ncos);
-                setCount(R.id.txtIndividuals, individuals);
-                setCount(R.id.txtEmployees, employees);
+                setCount(R.id.txtOfficers, finalOfficers);
+                setCount(R.id.txtNcos, finalNcos);
+                setCount(R.id.txtIndividuals, finalIndividuals);
+                setCount(R.id.txtEmployees, finalEmployees);
             });
         });
     }
@@ -57,10 +79,11 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
 
-        if (executor != null) {
-            executor.shutdown();
+        if (repository != null) {
+            repository.shutdown();
         }
+
+        super.onDestroy();
     }
 }
