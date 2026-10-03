@@ -9,7 +9,9 @@ public class Personnel {
     @PrimaryKey(autoGenerate = true)
     public long id;
 
-    // 1-10
+    // =========================
+    // البيانات الأساسية 1-10
+    // =========================
     public String recordId;
     public String fullName;
     public String rank;
@@ -21,7 +23,9 @@ public class Personnel {
     public String nationalNumber;
     public String familyBookNumber;
 
+    // =========================
     // 11-20
+    // =========================
     public String accountNumber;
     public String maritalStatus;
     public String spouseName;
@@ -33,7 +37,9 @@ public class Personnel {
     public String phone;
     public String personalCardNumber;
 
+    // =========================
     // 21-30
+    // =========================
     public String passportNumber;
     public String experience;
     public String languages;
@@ -45,7 +51,9 @@ public class Personnel {
     public String assignmentStartDate;
     public String assignmentEndDate;
 
+    // =========================
     // 31-40
+    // =========================
     public String currentMilitaryStatus;
     public String notes;
     public String birthDate;
@@ -57,7 +65,9 @@ public class Personnel {
     public String emergencyContactPhone;
     public String unitSector;
 
+    // =========================
     // 41-50
+    // =========================
     public String jobGrade;
     public String previousRank;
     public String promotionDecisionNumber;
@@ -69,7 +79,9 @@ public class Personnel {
     public String assignmentStart;
     public String assignmentEnd;
 
+    // =========================
     // 51-60
+    // =========================
     public String assignmentDecisionNumber;
     public String assignmentStatus;
     public String courseType;
@@ -81,7 +93,9 @@ public class Personnel {
     public String courseLevel;
     public String certificateNumber;
 
+    // =========================
     // 61-70
+    // =========================
     public String qualification;
     public String specialization;
     public String educationalInstitution;
@@ -93,7 +107,9 @@ public class Personnel {
     public String language1Writing;
     public String language1Speaking;
 
+    // =========================
     // 71-80
+    // =========================
     public String language2;
     public String language2Reading;
     public String language2Writing;
@@ -105,7 +121,9 @@ public class Personnel {
     public String issuingAuthority;
     public String documentStatus;
 
+    // =========================
     // 81-90
+    // =========================
     public String alertStatus;
     public String alertText;
     public String alertDate;
@@ -117,7 +135,9 @@ public class Personnel {
     public int exceptionalPromotionsCount;
     public String exceptionalPromotionDecisionNumbers;
 
+    // =========================
     // 91-100
+    // =========================
     public int verbalReprimandCount;
     public int writtenReprimandCount;
     public int verbalWarningCount;
@@ -129,7 +149,9 @@ public class Personnel {
     public String injured;
     public String injuryDate;
 
+    // =========================
     // 101-110
+    // =========================
     public String martyr;
     public String martyrdomDate;
     public int appreciationLettersCount;
@@ -141,7 +163,9 @@ public class Personnel {
     public String securityPlanParticipation;
     public String caseArrestStatus;
 
+    // =========================
     // 111-116
+    // =========================
     public int caseCount;
     public String goodConduct;
     public String weapon;
@@ -149,7 +173,9 @@ public class Personnel {
     public String vehicle;
     public String otherEquipment;
 
-    // Financial data
+    // =========================
+    // البيانات المالية
+    // =========================
     public String financialNumber;
     public String bankName;
     public String bankBranchName;
@@ -159,15 +185,30 @@ public class Personnel {
     public String salaryStatusDate;
     public String financialNotes;
 
-    // Position assignment
+    // =========================
+    // البيانات الإدارية
+    // =========================
     public String assignedPosition;
+    public String centralRegion;
+    public String workStatus;
+    public String membershipStatus;
+    public String disabilityStatus;
 
-    // Administrative termination
+    // =========================
+    // إنهاء العضوية
+    // =========================
     public String terminationStatus;
     public String terminationDate;
     public String terminationReason;
 
-    // Audit
+    // =========================
+    // العنصر النسائي / الجنس
+    // =========================
+    public String gender;
+
+    // =========================
+    // التدقيق
+    // =========================
     public String createdAt;
     public String updatedAt;
 }
