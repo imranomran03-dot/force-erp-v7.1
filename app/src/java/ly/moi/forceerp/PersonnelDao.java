@@ -11,296 +11,495 @@ import java.util.List;
 @Dao
 public interface PersonnelDao {
 
-    // =========================
-    // إضافة منتسب
-    // =========================
+    // =========================================================
+    // الإضافة والتعديل والحذف
+    // =========================================================
+
     @Insert
     long insert(Personnel personnel);
 
-
-    // =========================
-    // تعديل بيانات منتسب
-    // =========================
     @Update
     int update(Personnel personnel);
 
-
-    // =========================
-    // حذف منتسب
-    // =========================
     @Delete
     int delete(Personnel personnel);
 
 
-    // =========================
-    // جلب جميع المنتسبين
-    // =========================
+    // =========================================================
+    // جميع المنتسبين
+    // =========================================================
+
     @Query("SELECT * FROM personnel ORDER BY fullName ASC")
     List<Personnel> getAll();
 
 
-    // =========================
-    // جلب منتسب بواسطة المعرّف
-    // =========================
+    // =========================================================
+    // البحث بالمعرف
+    // =========================================================
+
     @Query("SELECT * FROM personnel WHERE id = :id LIMIT 1")
     Personnel getById(long id);
 
 
-    // =========================
+    // =========================================================
     // البحث بالاسم
-    // =========================
+    // =========================================================
+
     @Query("SELECT * FROM personnel WHERE fullName LIKE '%' || :name || '%' ORDER BY fullName ASC")
     List<Personnel> searchByName(String name);
 
 
-    // =========================
+    // =========================================================
     // البحث بالرقم الوطني
-    // =========================
+    // =========================================================
+
     @Query("SELECT * FROM personnel WHERE nationalNumber = :nationalNumber LIMIT 1")
     Personnel getByNationalNumber(String nationalNumber);
 
 
-    // =========================
-    // البحث بالرقم العسكري/الحسابي
-    // =========================
+    // =========================================================
+    // البحث بالرقم الحسابي
+    // =========================================================
+
     @Query("SELECT * FROM personnel WHERE accountNumber = :accountNumber LIMIT 1")
     Personnel getByAccountNumber(String accountNumber);
 
 
-    // =========================
-    // جلب منتسبي فرع محدد
-    // =========================
-    @Query("SELECT * FROM personnel WHERE branch = :branch ORDER BY fullName ASC")
-    List<Personnel> getByBranch(String branch);
-
-
-    // =========================
-    // إجمالي عدد المنتسبين
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel")
-    int getTotalCount();
-
-
-    // =========================
-    // إجمالي منتسبي فرع محدد
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE branch = :branch")
-    int getBranchCount(String branch);
-
-
-    // =========================
-    // عدد حالة مرتب محددة
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE salaryStatus = :salaryStatus")
-    int getSalaryStatusCount(String salaryStatus);
-
-
-    // =========================
-    // عدد حالة مرتب محددة داخل فرع
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE branch = :branch AND salaryStatus = :salaryStatus")
-    int getBranchSalaryStatusCount(String branch, String salaryStatus);
-
-
-    // =========================
-    // عدد فئة وظيفية محددة
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE jobStatus = :jobStatus")
-    int getJobStatusCount(String jobStatus);
-
-
-    // =========================
-    // عدد فئة وظيفية محددة داخل فرع
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE branch = :branch AND jobStatus = :jobStatus")
-    int getBranchJobStatusCount(String branch, String jobStatus);
-
-
-    // =========================
-    // عدد الضباط
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE jobStatus = 'ضابط'")
-    int getOfficersCount();
-
-
-    // =========================
-    // عدد ضباط الصف
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE jobStatus = 'ضابط صف'")
-    int getNonCommissionedOfficersCount();
-
-
-    // =========================
-    // عدد الأفراد
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE jobStatus = 'فرد'")
-    int getIndividualsCount();
-
-
-    // =========================
-    // عدد الموظفين
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE jobStatus = 'موظف'")
-    int getEmployeesCount();
-
-
-    // =========================
-    // عدد الضباط داخل فرع
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE branch = :branch AND jobStatus = 'ضابط'")
-    int getBranchOfficersCount(String branch);
-
-
-    // =========================
-    // عدد ضباط الصف داخل فرع
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE branch = :branch AND jobStatus = 'ضابط صف'")
-    int getBranchNonCommissionedOfficersCount(String branch);
-
-
-    // =========================
-    // عدد الأفراد داخل فرع
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE branch = :branch AND jobStatus = 'فرد'")
-    int getBranchIndividualsCount(String branch);
-
-
-    // =========================
-    // عدد الموظفين داخل فرع
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE branch = :branch AND jobStatus = 'موظف'")
-    int getBranchEmployeesCount(String branch);
-
-
-    // =========================
-    // عدد المرتب اللحظي
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE salaryStatus = 'مرتب لحظي'")
-    int getCurrentSalaryCount();
-
-
-    // =========================
-    // عدد راتب الحوافظ
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE salaryStatus = 'راتب حوافظ'")
-    int getSalaryListsCount();
-
-
-    // =========================
-    // عدد المنح
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE salaryStatus = 'منحة'")
-    int getGrantsCount();
-
-
-    // =========================
-    // عدد من لا يتقاضون مرتب
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE salaryStatus = 'لا يتقاضى مرتب'")
-    int getWithoutSalaryCount();
-
-
-    // =========================
-    // عدد الموقوفة مرتباتهم
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE salaryStatus = 'موقوف'")
-    int getSuspendedSalaryCount();
-
-
-    // =========================
-    // المرتب اللحظي داخل فرع
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE branch = :branch AND salaryStatus = 'مرتب لحظي'")
-    int getBranchCurrentSalaryCount(String branch);
-
-
-    // =========================
-    // راتب الحوافظ داخل فرع
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE branch = :branch AND salaryStatus = 'راتب حوافظ'")
-    int getBranchSalaryListsCount(String branch);
-
-
-    // =========================
-    // المنح داخل فرع
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE branch = :branch AND salaryStatus = 'منحة'")
-    int getBranchGrantsCount(String branch);
-
-
-    // =========================
-    // لا يتقاضى مرتب داخل فرع
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE branch = :branch AND salaryStatus = 'لا يتقاضى مرتب'")
-    int getBranchWithoutSalaryCount(String branch);
-
-
-    // =========================
-    // الموقوفة مرتباتهم داخل فرع
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE branch = :branch AND salaryStatus = 'موقوف'")
-    int getBranchSuspendedSalaryCount(String branch);
-
-
-    // =========================
-    // عدد المنتهية خدمتهم
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE terminationStatus IS NOT NULL AND terminationStatus != ''")
-    int getTerminatedCount();
-
-
-    // =========================
-    // عدد الشهداء
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE martyr = 'نعم'")
-    int getMartyrsCount();
-
-
-    // =========================
-    // عدد المصابين
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE injured = 'نعم'")
-    int getInjuredCount();
-
-
-    // =========================
-    // عدد المشاركين في الخطط الأمنية
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE securityPlanParticipation = 'نعم'")
-    int getSecurityPlanParticipantsCount();
-
-
-    // =========================
-    // عدد أصحاب قضايا
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE caseArrestStatus = 'نعم'")
-    int getCaseArrestsCount();
-
-
-    // =========================
-    // عدد منتسبي فرع حسب حالة العمل
-    // =========================
-    @Query("SELECT COUNT(*) FROM personnel WHERE branch = :branch AND currentMilitaryStatus = :status")
-    int getBranchMilitaryStatusCount(String branch, String status);
-
-
-    // =========================
+    // =========================================================
     // البحث العام
     // الاسم أو الرقم الوطني أو الرقم الحسابي
-    // =========================
+    // =========================================================
+
     @Query(
-        "SELECT * FROM personnel " +
-        "WHERE fullName LIKE '%' || :search || '%' " +
-        "OR nationalNumber LIKE '%' || :search || '%' " +
-        "OR accountNumber LIKE '%' || :search || '%' " +
-        "ORDER BY fullName ASC"
+            "SELECT * FROM personnel " +
+            "WHERE fullName LIKE '%' || :search || '%' " +
+            "OR nationalNumber LIKE '%' || :search || '%' " +
+            "OR accountNumber LIKE '%' || :search || '%' " +
+            "ORDER BY fullName ASC"
     )
     List<Personnel> globalSearch(String search);
 
 
-    // =========================
+    // =========================================================
+    // المنتسبون حسب الفرع
+    // =========================================================
+
+    @Query("SELECT * FROM personnel WHERE branch = :branch ORDER BY fullName ASC")
+    List<Personnel> getByBranch(String branch);
+
+
+    // =========================================================
+    // إجمالي القوة
+    // =========================================================
+
+    @Query("SELECT COUNT(*) FROM personnel")
+    int getTotalCount();
+
+
+    // =========================================================
+    // إجمالي قوة فرع محدد
+    // =========================================================
+
+    @Query("SELECT COUNT(*) FROM personnel WHERE branch = :branch")
+    int getBranchCount(String branch);
+
+
+    // =========================================================
+    // الفئات الوظيفية
+    // =========================================================
+
+    @Query("SELECT COUNT(*) FROM personnel WHERE jobStatus = :jobStatus")
+    int getJobStatusCount(String jobStatus);
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE branch = :branch AND jobStatus = :jobStatus"
+    )
+    int getBranchJobStatusCount(String branch, String jobStatus);
+
+
+    // =========================================================
+    // الضباط
+    // =========================================================
+
+    @Query("SELECT COUNT(*) FROM personnel WHERE jobStatus = 'ضابط'")
+    int getOfficersCount();
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE branch = :branch AND jobStatus = 'ضابط'"
+    )
+    int getBranchOfficersCount(String branch);
+
+
+    // =========================================================
+    // ضباط الصف
+    // =========================================================
+
+    @Query("SELECT COUNT(*) FROM personnel WHERE jobStatus = 'ضابط صف'")
+    int getNonCommissionedOfficersCount();
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE branch = :branch AND jobStatus = 'ضابط صف'"
+    )
+    int getBranchNonCommissionedOfficersCount(String branch);
+
+
+    // =========================================================
+    // الأفراد
+    // =========================================================
+
+    @Query("SELECT COUNT(*) FROM personnel WHERE jobStatus = 'فرد'")
+    int getIndividualsCount();
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE branch = :branch AND jobStatus = 'فرد'"
+    )
+    int getBranchIndividualsCount(String branch);
+
+
+    // =========================================================
+    // الموظفون
+    // =========================================================
+
+    @Query("SELECT COUNT(*) FROM personnel WHERE jobStatus = 'موظف'")
+    int getEmployeesCount();
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE branch = :branch AND jobStatus = 'موظف'"
+    )
+    int getBranchEmployeesCount(String branch);
+
+
+    // =========================================================
+    // الحالات المالية
+    // =========================================================
+
+    @Query("SELECT COUNT(*) FROM personnel WHERE salaryStatus = :salaryStatus")
+    int getSalaryStatusCount(String salaryStatus);
+
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE branch = :branch AND salaryStatus = :salaryStatus"
+    )
+    int getBranchSalaryStatusCount(String branch, String salaryStatus);
+
+
+    // =========================================================
+    // مرتب لحظي
+    // =========================================================
+
+    @Query("SELECT COUNT(*) FROM personnel WHERE salaryStatus = 'مرتب لحظي'")
+    int getCurrentSalaryCount();
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE branch = :branch AND salaryStatus = 'مرتب لحظي'"
+    )
+    int getBranchCurrentSalaryCount(String branch);
+
+
+    // =========================================================
+    // راتب حوافظ
+    // =========================================================
+
+    @Query("SELECT COUNT(*) FROM personnel WHERE salaryStatus = 'راتب حوافظ'")
+    int getSalaryListsCount();
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE branch = :branch AND salaryStatus = 'راتب حوافظ'"
+    )
+    int getBranchSalaryListsCount(String branch);
+
+
+    // =========================================================
+    // المنح
+    // =========================================================
+
+    @Query("SELECT COUNT(*) FROM personnel WHERE salaryStatus = 'منحة'")
+    int getGrantsCount();
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE branch = :branch AND salaryStatus = 'منحة'"
+    )
+    int getBranchGrantsCount(String branch);
+
+
+    // =========================================================
+    // لا يتقاضى مرتب
+    // =========================================================
+
+    @Query("SELECT COUNT(*) FROM personnel WHERE salaryStatus = 'لا يتقاضى مرتب'")
+    int getWithoutSalaryCount();
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE branch = :branch AND salaryStatus = 'لا يتقاضى مرتب'"
+    )
+    int getBranchWithoutSalaryCount(String branch);
+
+
+    // =========================================================
+    // مرتب موقوف
+    // =========================================================
+
+    @Query("SELECT COUNT(*) FROM personnel WHERE salaryStatus = 'موقوف'")
+    int getSuspendedSalaryCount();
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE branch = :branch AND salaryStatus = 'موقوف'"
+    )
+    int getBranchSuspendedSalaryCount(String branch);
+
+
+    // =========================================================
+    // الحالة العسكرية
+    // =========================================================
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE currentMilitaryStatus = :status"
+    )
+    int getMilitaryStatusCount(String status);
+
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE branch = :branch AND currentMilitaryStatus = :status"
+    )
+    int getBranchMilitaryStatusCount(String branch, String status);
+
+
+    // =========================================================
+    // التكليف
+    // =========================================================
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE assignmentType = :assignmentType"
+    )
+    int getAssignmentTypeCount(String assignmentType);
+
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE branch = :branch AND assignmentType = :assignmentType"
+    )
+    int getBranchAssignmentTypeCount(
+            String branch,
+            String assignmentType
+    );
+
+
+    // =========================================================
+    // المنصب المكلف به
+    // =========================================================
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE assignedPosition = :position"
+    )
+    int getAssignedPositionCount(String position);
+
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE branch = :branch AND assignedPosition = :position"
+    )
+    int getBranchAssignedPositionCount(
+            String branch,
+            String position
+    );
+
+
+    // =========================================================
+    // الشهداء
+    // =========================================================
+
+    @Query("SELECT COUNT(*) FROM personnel WHERE martyr = 'نعم'")
+    int getMartyrsCount();
+
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE branch = :branch AND martyr = 'نعم'"
+    )
+    int getBranchMartyrsCount(String branch);
+
+
+    // =========================================================
+    // المصابون
+    // =========================================================
+
+    @Query("SELECT COUNT(*) FROM personnel WHERE injured = 'نعم'")
+    int getInjuredCount();
+
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE branch = :branch AND injured = 'نعم'"
+    )
+    int getBranchInjuredCount(String branch);
+
+
+    // =========================================================
+    // الخطط الأمنية
+    // =========================================================
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE securityPlanParticipation = 'نعم'"
+    )
+    int getSecurityPlanParticipantsCount();
+
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE branch = :branch " +
+            "AND securityPlanParticipation = 'نعم'"
+    )
+    int getBranchSecurityPlanParticipantsCount(String branch);
+
+
+    // =========================================================
+    // القضايا
+    // =========================================================
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE caseArrestStatus = 'نعم'"
+    )
+    int getCaseArrestsCount();
+
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE branch = :branch AND caseArrestStatus = 'نعم'"
+    )
+    int getBranchCaseArrestsCount(String branch);
+
+
+    // =========================================================
+    // عدد القضايا
+    // =========================================================
+
+    @Query("SELECT COALESCE(SUM(caseCount), 0) FROM personnel")
+    int getTotalCaseCount();
+
+
+    @Query(
+            "SELECT COALESCE(SUM(caseCount), 0) FROM personnel " +
+            "WHERE branch = :branch"
+    )
+    int getBranchCaseCount(String branch);
+
+
+    // =========================================================
+    // الدورات
+    // =========================================================
+
+    @Query("SELECT COUNT(*) FROM personnel WHERE courseName IS NOT NULL AND courseName != ''")
+    int getTrainedPersonnelCount();
+
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE branch = :branch " +
+            "AND courseName IS NOT NULL " +
+            "AND courseName != ''"
+    )
+    int getBranchTrainedPersonnelCount(String branch);
+
+
+    // =========================================================
+    // المؤهلات
+    // =========================================================
+
+    @Query("SELECT COUNT(*) FROM personnel WHERE qualification IS NOT NULL AND qualification != ''")
+    int getQualifiedPersonnelCount();
+
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE branch = :branch " +
+            "AND qualification IS NOT NULL " +
+            "AND qualification != ''"
+    )
+    int getBranchQualifiedPersonnelCount(String branch);
+
+
+    // =========================================================
+    // التنبيهات
+    // =========================================================
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE alertStatus IS NOT NULL " +
+            "AND alertStatus != ''"
+    )
+    int getAlertsCount();
+
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE branch = :branch " +
+            "AND alertStatus IS NOT NULL " +
+            "AND alertStatus != ''"
+    )
+    int getBranchAlertsCount(String branch);
+
+
+    // =========================================================
+    // الوثائق المنتهية
+    // =========================================================
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE documentStatus = 'منتهية'"
+    )
+    int getExpiredDocumentsCount();
+
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE branch = :branch " +
+            "AND documentStatus = 'منتهية'"
+    )
+    int getBranchExpiredDocumentsCount(String branch);
+
+
+    // =========================================================
+    // المنتهية خدمتهم
+    // =========================================================
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE terminationStatus IS NOT NULL " +
+            "AND terminationStatus != ''"
+    )
+    int getTerminatedCount();
+
+
+    @Query(
+            "SELECT COUNT(*) FROM personnel " +
+            "WHERE branch = :branch " +
+            "AND terminationStatus IS NOT NULL " +
+            "AND terminationStatus != ''"
+    )
+    int getBranchTerminatedCount(String branch);
+
+
+    // =========================================================
     // حذف جميع البيانات
-    // =========================
+    // =========================================================
+
     @Query("DELETE FROM personnel")
     void deleteAll();
 }
