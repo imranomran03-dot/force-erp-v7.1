@@ -19,14 +19,18 @@ import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends Activity {
 
@@ -45,6 +49,12 @@ public class MainActivity extends Activity {
 
     private LinearLayout root;
     private SharedPreferences prefs;
+
+    private AppDatabase database;
+    private PersonnelDao personnelDao;
+    private ExecutorService databaseExecutor;
+
+    private volatile boolean databaseReady = false;
 
     private final ArrayList<LinkedHashMap<String, String>> personnel =
             new ArrayList<>();
@@ -179,7 +189,7 @@ public class MainActivity extends Activity {
     };
 
     // =========================================================
-    // EXTRA FIELDS REQUESTED
+    // EXTRA FIELDS
     // =========================================================
 
     private final String[] EXTRA_FIELDS = {
@@ -190,11 +200,150 @@ public class MainActivity extends Activity {
             "اسم فرع المصرف",
             "رقم الحساب",
             "حالة المرتب",
+            "سبب إيقاف المرتب",
+            "تاريخ حالة المرتب",
+            "ملاحظات مالية",
             "حالة العمل",
             "حالة العضوية",
             "سبب إنهاء العضوية",
             "حالة العجز/التقييم",
             "رقم مالي"
+    };
+
+    // =========================================================
+    // ROOM FIELD MAP
+    // نفس ترتيب الـ116 خانة في Personnel.java
+    // =========================================================
+
+    private final String[] ENTITY_FIELDS = {
+
+            "recordId",
+            "fullName",
+            "rank",
+            "surname",
+            "branch",
+            "fatherName",
+            "motherName",
+            "jobStatus",
+            "nationalNumber",
+            "familyBookNumber",
+
+            "accountNumber",
+            "maritalStatus",
+            "spouseName",
+            "childrenCount",
+            "bloodType",
+            "uniformSize",
+            "shoeSize",
+            "residenceCity",
+            "phone",
+            "personalCardNumber",
+
+            "passportNumber",
+            "experience",
+            "languages",
+            "appointmentDecisionNumber",
+            "appointmentDecisionDate",
+            "lastPromotionNumber",
+            "lastPromotionDate",
+            "previousPromotions",
+            "assignmentStartDate",
+            "assignmentEndDate",
+
+            "currentMilitaryStatus",
+            "notes",
+            "birthDate",
+            "age",
+            "birthPlace",
+            "detailedAddress",
+            "alternativePhone",
+            "emergencyContactName",
+            "emergencyContactPhone",
+            "unitSector",
+
+            "jobGrade",
+            "previousRank",
+            "promotionDecisionNumber",
+            "promotionDecisionDate",
+            "promotionDecisionAuthority",
+            "assignmentType",
+            "assignmentAuthority",
+            "assignmentLocation",
+            "assignmentStart",
+            "assignmentEnd",
+
+            "assignmentDecisionNumber",
+            "assignmentStatus",
+            "courseType",
+            "courseName",
+            "trainingAuthority",
+            "trainingCountry",
+            "courseStartDate",
+            "courseEndDate",
+            "courseLevel",
+            "certificateNumber",
+
+            "qualification",
+            "specialization",
+            "educationalInstitution",
+            "graduationCountry",
+            "graduationYear",
+            "graduationGrade",
+            "language1",
+            "language1Reading",
+            "language1Writing",
+            "language1Speaking",
+
+            "language2",
+            "language2Reading",
+            "language2Writing",
+            "language2Speaking",
+            "documentType",
+            "documentNumber",
+            "documentDate",
+            "documentExpiryDate",
+            "issuingAuthority",
+            "documentStatus",
+
+            "alertStatus",
+            "alertText",
+            "alertDate",
+            "remainingDays",
+            "nextPromotionEligibilityDate",
+            "promotionRemainingMonths",
+            "promotionAlertStatus",
+            "medalsAndAwards",
+            "exceptionalPromotionsCount",
+            "exceptionalPromotionDecisionNumbers",
+
+            "verbalReprimandCount",
+            "writtenReprimandCount",
+            "verbalWarningCount",
+            "writtenWarningCount",
+            "rankReductionCount",
+            "chargesCount",
+            "administrativeInvestigationCount",
+            "sickLeaveDays",
+            "injured",
+            "injuryDate",
+
+            "martyr",
+            "martyrdomDate",
+            "appreciationLettersCount",
+            "positiveEvaluationPoints",
+            "negativeEvaluationPoints",
+            "annualEvaluationPercentage",
+            "annualEvaluationGrade",
+            "photoPath",
+            "securityPlanParticipation",
+            "caseArrestStatus",
+
+            "caseCount",
+            "goodConduct",
+            "weapon",
+            "radio",
+            "vehicle",
+            "otherEquipment"
     };
 
     // =========================================================
@@ -246,8 +395,10 @@ public class MainActivity extends Activity {
 
     private final String[] SALARY_STATUS = {
             "— اختر حالة المرتب —",
-            "جاري",
+            "مرتب لحظي",
+            "راتب حوافظ",
             "منحة",
+            "لا يتقاضى مرتب",
             "موقوف"
     };
 
@@ -287,6 +438,14 @@ public class MainActivity extends Activity {
             "متزوج",
             "مطلق",
             "أرمل"
+    };
+
+    private final String[] JOB_TYPES = {
+            "— اختر الصفة الوظيفية —",
+            "ضابط",
+            "ضابط صف",
+            "فرد",
+            "موظف"
     };
 
     private final String[] MILITARY_STATUS = {
@@ -359,7 +518,588 @@ public class MainActivity extends Activity {
 
         loadPersonnel();
 
+        try {
+            database = DatabaseProvider.getDatabase(this);
+            personnelDao = database.personnelDao();
+            databaseExecutor = Executors.newSingleThreadExecutor();
+
+            loadFromRoom();
+
+        } catch (Exception e) {
+
+            databaseReady = true;
+
+            message(
+                    "قاعدة البيانات",
+                    "تعذر تهيئة قاعدة البيانات.\n" +
+                    safeException(e)
+            );
+        }
+
         showLogin();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (databaseExecutor != null) {
+            databaseExecutor.shutdown();
+        }
+    }
+
+    // =========================================================
+    // ROOM LOAD + LEGACY MIGRATION
+    // =========================================================
+
+    private void loadFromRoom() {
+
+        if (databaseExecutor == null ||
+                personnelDao == null) {
+
+            databaseReady = true;
+            return;
+        }
+
+        final ArrayList<LinkedHashMap<String, String>> legacy =
+                copyPersonnel();
+
+        databaseExecutor.execute(
+                new Runnable() {
+                    @Override
+                    public void run() {
+
+                        try {
+
+                            List<Personnel> rows =
+                                    personnelDao.getAll();
+
+                            // إذا كانت Room فارغة وهناك بيانات قديمة:
+                            // ننقلها إلى Room.
+                            if (rows.isEmpty() &&
+                                    !legacy.isEmpty()) {
+
+                                for (LinkedHashMap<String, String> record :
+                                        legacy) {
+
+                                    Personnel entity =
+                                            recordToPersonnel(
+                                                    record,
+                                                    null
+                                            );
+
+                                    personnelDao.insert(entity);
+                                }
+
+                                rows =
+                                        personnelDao.getAll();
+                            }
+
+                            final ArrayList<LinkedHashMap<String, String>>
+                                    loaded =
+                                    new ArrayList<>();
+
+                            for (Personnel entity :
+                                    rows) {
+
+                                LinkedHashMap<String, String> record =
+                                        personnelToRecord(entity);
+
+                                mergeLegacyExtras(
+                                        record,
+                                        legacy
+                                );
+
+                                loaded.add(record);
+                            }
+
+                            runOnUiThread(
+                                    new Runnable() {
+                                        @Override
+                                        public void run() {
+
+                                            personnel.clear();
+
+                                            personnel.addAll(
+                                                    loaded
+                                            );
+
+                                            databaseReady = true;
+                                        }
+                                    }
+                            );
+
+                        } catch (Exception e) {
+
+                            runOnUiThread(
+                                    new Runnable() {
+                                        @Override
+                                        public void run() {
+
+                                            databaseReady = true;
+
+                                            message(
+                                                    "قاعدة البيانات",
+                                                    "حدث خطأ أثناء قراءة البيانات.\n" +
+                                                    safeException(e)
+                                            );
+                                        }
+                                    }
+                            );
+                        }
+                    }
+                }
+        );
+    }
+
+    private void mergeLegacyExtras(
+            LinkedHashMap<String, String> target,
+            ArrayList<LinkedHashMap<String, String>> legacy) {
+
+        String id =
+                safe(
+                        target.get(
+                                "معرّف السجل"
+                        )
+                );
+
+        for (LinkedHashMap<String, String> old :
+                legacy) {
+
+            if (id.equals(
+                    safe(
+                            old.get(
+                                    "معرّف السجل"
+                            )
+                    )
+            )) {
+
+                for (String field :
+                        EXTRA_FIELDS) {
+
+                    if (old.containsKey(field)) {
+
+                        target.put(
+                                field,
+                                safeForStorage(
+                                        old.get(field)
+                                )
+                        );
+                    }
+                }
+
+                return;
+            }
+        }
+    }
+
+    private ArrayList<LinkedHashMap<String, String>>
+    copyPersonnel() {
+
+        ArrayList<LinkedHashMap<String, String>>
+                result =
+                new ArrayList<>();
+
+        for (LinkedHashMap<String, String> record :
+                personnel) {
+
+            result.add(
+                    new LinkedHashMap<>(record)
+            );
+        }
+
+        return result;
+    }
+
+    // =========================================================
+    // ROOM SAVE
+    // =========================================================
+
+    private void persistRecordToRoom(
+            final LinkedHashMap<String, String> record) {
+
+        saveLegacyBackup();
+
+        if (databaseExecutor == null ||
+                personnelDao == null) {
+            return;
+        }
+
+        databaseExecutor.execute(
+                new Runnable() {
+                    @Override
+                    public void run() {
+
+                        try {
+
+                            String recordId =
+                                    safe(
+                                            record.get(
+                                                    "معرّف السجل"
+                                            )
+                                    );
+
+                            Personnel existing =
+                                    null;
+
+                            List<Personnel> all =
+                                    personnelDao.getAll();
+
+                            for (Personnel item : all) {
+
+                                if (recordId.equals(
+                                        safe(item.recordId)
+                                )) {
+
+                                    existing = item;
+                                    break;
+                                }
+                            }
+
+                            Personnel entity =
+                                    recordToPersonnel(
+                                            record,
+                                            existing
+                                    );
+
+                            if (existing == null) {
+
+                                personnelDao.insert(
+                                        entity
+                                );
+
+                            } else {
+
+                                personnelDao.update(
+                                        entity
+                                );
+                            }
+
+                        } catch (Exception e) {
+
+                            runOnUiThread(
+                                    new Runnable() {
+                                        @Override
+                                        public void run() {
+
+                                            message(
+                                                    "خطأ في الحفظ",
+                                                    "تم تحديث الواجهة، لكن حدث خطأ أثناء الكتابة إلى قاعدة البيانات.\n" +
+                                                    safeException(e)
+                                            );
+                                        }
+                                    }
+                            );
+                        }
+                    }
+                }
+        );
+    }
+
+    // =========================================================
+    // REFLECTION MAPPER
+    // =========================================================
+
+    private Personnel recordToPersonnel(
+            LinkedHashMap<String, String> record,
+            Personnel existing) {
+
+        Personnel p =
+                existing == null
+                        ? new Personnel()
+                        : existing;
+
+        for (int i = 0;
+             i < ENTITY_FIELDS.length &&
+                     i < FIELDS.length;
+             i++) {
+
+            String entityField =
+                    ENTITY_FIELDS[i];
+
+            String uiField =
+                    FIELDS[i];
+
+            String value =
+                    safeForStorage(
+                            record.get(uiField)
+                    );
+
+            try {
+
+                Field field =
+                        Personnel.class.getField(
+                                entityField
+                        );
+
+                setEntityField(
+                        p,
+                        field,
+                        value
+                );
+
+            } catch (Exception ignored) {
+                // الحقول تتم مطابقتها حسب Personnel.java
+            }
+        }
+
+        p.financialNumber =
+                safeForStorage(
+                        record.get("رقم مالي")
+                );
+
+        p.bankName =
+                safeForStorage(
+                        record.get("اسم المصرف")
+                );
+
+        p.bankBranchName =
+                safeForStorage(
+                        record.get("اسم فرع المصرف")
+                );
+
+        p.bankAccountNumber =
+                safeForStorage(
+                        record.get("رقم الحساب")
+                );
+
+        p.salaryStatus =
+                safeForStorage(
+                        record.get("حالة المرتب")
+                );
+
+        p.salarySuspensionReason =
+                safeForStorage(
+                        record.get("سبب إيقاف المرتب")
+                );
+
+        p.salaryStatusDate =
+                safeForStorage(
+                        record.get("تاريخ حالة المرتب")
+                );
+
+        p.financialNotes =
+                safeForStorage(
+                        record.get("ملاحظات مالية")
+                );
+
+        p.assignedPosition =
+                safeForStorage(
+                        record.get("تكليف بالمنصب")
+                );
+
+        p.terminationStatus =
+                safeForStorage(
+                        record.get("حالة العضوية")
+                );
+
+        p.terminationReason =
+                safeForStorage(
+                        record.get("سبب إنهاء العضوية")
+                );
+
+        if (p.createdAt == null ||
+                p.createdAt.trim().length() == 0) {
+
+            p.createdAt =
+                    String.valueOf(
+                            System.currentTimeMillis()
+                    );
+        }
+
+        p.updatedAt =
+                String.valueOf(
+                        System.currentTimeMillis()
+                );
+
+        return p;
+    }
+
+    private void setEntityField(
+            Personnel p,
+            Field field,
+            String value)
+            throws IllegalAccessException {
+
+        Class<?> type =
+                field.getType();
+
+        if (type == String.class) {
+
+            field.set(
+                    p,
+                    value
+            );
+
+        } else if (type == int.class) {
+
+            field.setInt(
+                    p,
+                    parseInt(value)
+            );
+
+        } else if (type == double.class) {
+
+            field.setDouble(
+                    p,
+                    parseDouble(value)
+            );
+        }
+    }
+
+    private LinkedHashMap<String, String>
+    personnelToRecord(Personnel p) {
+
+        LinkedHashMap<String, String> record =
+                new LinkedHashMap<>();
+
+        for (int i = 0;
+             i < FIELDS.length &&
+                     i < ENTITY_FIELDS.length;
+             i++) {
+
+            String value = "";
+
+            try {
+
+                Field field =
+                        Personnel.class.getField(
+                                ENTITY_FIELDS[i]
+                        );
+
+                Object object =
+                        field.get(p);
+
+                value =
+                        object == null
+                                ? ""
+                                : String.valueOf(object);
+
+            } catch (Exception ignored) {
+            }
+
+            record.put(
+                    FIELDS[i],
+                    value
+            );
+        }
+
+        record.put(
+                "رقم مالي",
+                safeForStorage(
+                        p.financialNumber
+                )
+        );
+
+        record.put(
+                "اسم المصرف",
+                safeForStorage(
+                        p.bankName
+                )
+        );
+
+        record.put(
+                "اسم فرع المصرف",
+                safeForStorage(
+                        p.bankBranchName
+                )
+        );
+
+        record.put(
+                "رقم الحساب",
+                safeForStorage(
+                        p.bankAccountNumber
+                )
+        );
+
+        record.put(
+                "حالة المرتب",
+                safeForStorage(
+                        p.salaryStatus
+                )
+        );
+
+        record.put(
+                "سبب إيقاف المرتب",
+                safeForStorage(
+                        p.salarySuspensionReason
+                )
+        );
+
+        record.put(
+                "تاريخ حالة المرتب",
+                safeForStorage(
+                        p.salaryStatusDate
+                )
+        );
+
+        record.put(
+                "ملاحظات مالية",
+                safeForStorage(
+                        p.financialNotes
+                )
+        );
+
+        record.put(
+                "تكليف بالمنصب",
+                safeForStorage(
+                        p.assignedPosition
+                )
+        );
+
+        record.put(
+                "حالة العضوية",
+                safeForStorage(
+                        p.terminationStatus
+                )
+        );
+
+        record.put(
+                "سبب إنهاء العضوية",
+                safeForStorage(
+                        p.terminationReason
+                )
+        );
+
+        return record;
+    }
+
+    private int parseInt(String value) {
+
+        try {
+
+            if (value == null ||
+                    value.trim().length() == 0) {
+                return 0;
+            }
+
+            return Integer.parseInt(
+                    value.trim()
+            );
+
+        } catch (Exception e) {
+
+            return 0;
+        }
+    }
+
+    private double parseDouble(String value) {
+
+        try {
+
+            if (value == null ||
+                    value.trim().length() == 0) {
+                return 0.0;
+            }
+
+            return Double.parseDouble(
+                    value.trim()
+            );
+
+        } catch (Exception e) {
+
+            return 0.0;
+        }
     }
 
     // =========================================================
@@ -368,7 +1108,8 @@ public class MainActivity extends Activity {
 
     private void showLogin() {
 
-        LinearLayout page = new LinearLayout(this);
+        LinearLayout page =
+                new LinearLayout(this);
 
         page.setOrientation(
                 LinearLayout.VERTICAL
@@ -391,12 +1132,13 @@ public class MainActivity extends Activity {
                 View.LAYOUT_DIRECTION_RTL
         );
 
-        TextView logo = text(
-                "✦",
-                58,
-                GOLD,
-                true
-        );
+        TextView logo =
+                text(
+                        "قوة العمومية",
+                        28,
+                        GOLD,
+                        true
+                );
 
         logo.setGravity(Gravity.CENTER);
 
@@ -405,12 +1147,13 @@ public class MainActivity extends Activity {
                 lp(-1, 85)
         );
 
-        TextView title = text(
-                "منظومة إدارة القوة العمومية",
-                24,
-                DARK_GREEN,
-                true
-        );
+        TextView title =
+                text(
+                        "منظومة إدارة القوة العمومية",
+                        24,
+                        DARK_GREEN,
+                        true
+                );
 
         title.setGravity(Gravity.CENTER);
 
@@ -419,12 +1162,13 @@ public class MainActivity extends Activity {
                 lp(-1, 55)
         );
 
-        TextView version = text(
-                "V7.1",
-                15,
-                GOLD,
-                true
-        );
+        TextView version =
+                text(
+                        "V7.1",
+                        15,
+                        GOLD,
+                        true
+                );
 
         version.setGravity(Gravity.CENTER);
 
@@ -471,12 +1215,13 @@ public class MainActivity extends Activity {
                 margin(-1, 56, 0, 18, 0, 0)
         );
 
-        TextView note = text(
-                "نظام إداري متكامل لإدارة القوة العمومية",
-                14,
-                GRAY,
-                false
-        );
+        TextView note =
+                text(
+                        "نظام إداري متكامل لإدارة القوة العمومية",
+                        14,
+                        GRAY,
+                        false
+                );
 
         note.setGravity(Gravity.CENTER);
 
@@ -512,7 +1257,6 @@ public class MainActivity extends Activity {
                 }
         );
 
-        // الحل المباشر لمشكلة الشاشة البيضاء
         setContentView(page);
     }
 
@@ -527,12 +1271,13 @@ public class MainActivity extends Activity {
                 "منظومة إدارة القوة العمومية V7.1"
         );
 
-        TextView welcome = text(
-                "لوحة القيادة الرئيسية",
-                21,
-                DARK_GREEN,
-                true
-        );
+        TextView welcome =
+                text(
+                        "الموقف العام للجهاز",
+                        21,
+                        DARK_GREEN,
+                        true
+                );
 
         root.addView(
                 welcome,
@@ -541,7 +1286,9 @@ public class MainActivity extends Activity {
 
         addStatCard(
                 "إجمالي المنتسبين",
-                String.valueOf(personnel.size()),
+                String.valueOf(
+                        personnel.size()
+                ),
                 GREEN
         );
 
@@ -572,14 +1319,60 @@ public class MainActivity extends Activity {
                 RED
         );
 
+        addStatCard(
+                "مرتب لحظي",
+                countExact(
+                        "حالة المرتب",
+                        "مرتب لحظي"
+                ),
+                GREEN
+        );
+
+        addStatCard(
+                "راتب حوافظ",
+                countExact(
+                        "حالة المرتب",
+                        "راتب حوافظ"
+                ),
+                BLUE
+        );
+
+        addStatCard(
+                "منح",
+                countExact(
+                        "حالة المرتب",
+                        "منحة"
+                ),
+                ORANGE
+        );
+
+        addStatCard(
+                "لا يتقاضى مرتب",
+                countExact(
+                        "حالة المرتب",
+                        "لا يتقاضى مرتب"
+                ),
+                GRAY
+        );
+
+        addStatCard(
+                "موقوف المرتب",
+                countExact(
+                        "حالة المرتب",
+                        "موقوف"
+                ),
+                RED
+        );
+
         addSpace(root, 12);
 
-        TextView quick = text(
-                "الوصول السريع",
-                19,
-                DARK,
-                true
-        );
+        TextView quick =
+                text(
+                        "الوصول السريع",
+                        19,
+                        DARK,
+                        true
+                );
 
         root.addView(
                 quick,
@@ -587,7 +1380,7 @@ public class MainActivity extends Activity {
         );
 
         menu(
-                "👥  المنتسبون",
+                "المنتسبون",
                 GREEN,
                 new View.OnClickListener() {
                     @Override
@@ -598,7 +1391,7 @@ public class MainActivity extends Activity {
         );
 
         menu(
-                "➕  إضافة منتسب جديد",
+                "إضافة منتسب جديد",
                 BLUE,
                 new View.OnClickListener() {
                     @Override
@@ -609,7 +1402,7 @@ public class MainActivity extends Activity {
         );
 
         menu(
-                "🔎  البحث عن منتسب",
+                "البحث عن منتسب",
                 DARK_GREEN,
                 new View.OnClickListener() {
                     @Override
@@ -620,7 +1413,7 @@ public class MainActivity extends Activity {
         );
 
         menu(
-                "💳  البطاقة المالية",
+                "البطاقة المالية",
                 ORANGE,
                 new View.OnClickListener() {
                     @Override
@@ -631,7 +1424,7 @@ public class MainActivity extends Activity {
         );
 
         menu(
-                "🔄  الحركة والتكليف",
+                "الحركة والتكليف",
                 PURPLE,
                 new View.OnClickListener() {
                     @Override
@@ -642,7 +1435,7 @@ public class MainActivity extends Activity {
         );
 
         menu(
-                "📊  التقارير",
+                "التقارير",
                 BLUE,
                 new View.OnClickListener() {
                     @Override
@@ -653,7 +1446,7 @@ public class MainActivity extends Activity {
         );
 
         menu(
-                "⚙️  الإعدادات",
+                "الإعدادات",
                 GRAY,
                 new View.OnClickListener() {
                     @Override
@@ -694,12 +1487,12 @@ public class MainActivity extends Activity {
 
         createPage(
                 "المنتسبون",
-                "السجلات الفعلية المحفوظة داخل المنظومة"
+                "السجلات المحفوظة في المنظومة"
         );
 
         Button add =
                 createButton(
-                        "＋ إضافة منتسب جديد",
+                        "إضافة منتسب جديد",
                         GREEN
                 );
 
@@ -730,10 +1523,10 @@ public class MainActivity extends Activity {
                  i < personnel.size();
                  i++) {
 
-                final LinkedHashMap<String, String> record =
-                        personnel.get(i);
-
                 final int index = i;
+
+                LinkedHashMap<String, String> record =
+                        personnel.get(i);
 
                 String name =
                         safe(
@@ -746,9 +1539,13 @@ public class MainActivity extends Activity {
                         createButton(
                                 name +
                                 "\n" +
-                                safe(record.get("الرتبة")) +
+                                safe(
+                                        record.get("الرتبة")
+                                ) +
                                 "  •  " +
-                                safe(record.get("الفرع")),
+                                safe(
+                                        record.get("الفرع")
+                                ),
                                 WHITE
                         );
 
@@ -776,7 +1573,7 @@ public class MainActivity extends Activity {
     }
 
     // =========================================================
-    // FULL PERSONNEL FORM
+    // FORM
     // =========================================================
 
     private void openPersonnelForm(
@@ -787,21 +1584,26 @@ public class MainActivity extends Activity {
         formViews.clear();
 
         if (existing != null) {
+
             editingRecordId =
-                    safe(existing.get("معرّف السجل"));
+                    safe(
+                            existing.get(
+                                    "معرّف السجل"
+                            )
+                    );
         }
 
         createPage(
                 existing == null
                         ? "إضافة منتسب جديد"
                         : "تعديل بيانات المنتسب",
-                "116 خانة أساسية + البيانات الإضافية"
+                "البيانات الأساسية والمالية والإدارية"
         );
 
         addFormSection(
                 "القسم 1 — الهوية والبيانات الشخصية",
                 0,
-                22
+                23
         );
 
         addFormSection(
@@ -933,11 +1735,30 @@ public class MainActivity extends Activity {
 
         for (int i = from; i < to; i++) {
 
-            String field = FIELDS[i];
+            String field =
+                    FIELDS[i];
+
+            String value = null;
+
+            if (editingRecordId.length() > 0) {
+
+                int index =
+                        findRecordIndex(
+                                editingRecordId
+                        );
+
+                if (index >= 0) {
+
+                    value =
+                            personnel
+                                    .get(index)
+                                    .get(field);
+                }
+            }
 
             addDynamicField(
                     field,
-                    null
+                    value
             );
         }
     }
@@ -946,7 +1767,7 @@ public class MainActivity extends Activity {
 
         TextView header =
                 text(
-                        "القسم 9 — بيانات إضافية للمنظومة",
+                        "القسم 9 — البيانات الإضافية والمالية",
                         18,
                         WHITE,
                         true
@@ -972,14 +1793,33 @@ public class MainActivity extends Activity {
                 margin(-1, 46, 0, 8, 0, 0)
         );
 
-        for (String field : EXTRA_FIELDS) {
-            addDynamicField(field, null);
+        for (String field :
+                EXTRA_FIELDS) {
+
+            String value = null;
+
+            if (editingRecordId.length() > 0) {
+
+                int index =
+                        findRecordIndex(
+                                editingRecordId
+                        );
+
+                if (index >= 0) {
+
+                    value =
+                            personnel
+                                    .get(index)
+                                    .get(field);
+                }
+            }
+
+            addDynamicField(
+                    field,
+                    value
+            );
         }
     }
-
-    // =========================================================
-    // DYNAMIC FIELD CREATION
-    // =========================================================
 
     private void addDynamicField(
             String field,
@@ -1034,18 +1874,15 @@ public class MainActivity extends Activity {
             }
 
             if (field.equals(
-                    "العمر (تلقائي)")) {
-
-                edit.setEnabled(false);
-            }
-
-            if (field.equals(
-                    "التقدير السنوي (تلقائي)")) {
+                    "العمر (تلقائي)") ||
+                    field.equals(
+                            "التقدير السنوي (تلقائي)")) {
 
                 edit.setEnabled(false);
             }
 
             if (isNumberField(field)) {
+
                 edit.setInputType(
                         InputType.TYPE_CLASS_NUMBER |
                         InputType.TYPE_NUMBER_FLAG_DECIMAL
@@ -1053,6 +1890,7 @@ public class MainActivity extends Activity {
             }
 
             if (isLongText(field)) {
+
                 edit.setSingleLine(false);
                 edit.setMinHeight(dp(80));
                 edit.setGravity(
@@ -1063,14 +1901,16 @@ public class MainActivity extends Activity {
 
             root.addView(
                     edit,
-                    margin(-1,
+                    margin(
+                            -1,
                             isLongText(field)
                                     ? 82
                                     : 58,
                             0,
                             8,
                             0,
-                            0)
+                            0
+                    )
             );
 
             formViews.put(
@@ -1080,12 +1920,17 @@ public class MainActivity extends Activity {
         }
     }
 
+    // =========================================================
+    // SPINNERS
+    // =========================================================
+
     private boolean isSpinnerField(
             String field) {
 
         return field.equals("الفرع") ||
                 field.equals("حالة الزواج") ||
                 field.equals("فصيلة الدم") ||
+                field.equals("الصفة الوظيفية") ||
                 field.equals("الحالة العسكرية الحالية") ||
                 field.equals("الدرجة الوظيفية") ||
                 field.equals("نوع التكليف") ||
@@ -1127,6 +1972,9 @@ public class MainActivity extends Activity {
         if (field.equals("فصيلة الدم"))
             return BLOOD_TYPES;
 
+        if (field.equals("الصفة الوظيفية"))
+            return JOB_TYPES;
+
         if (field.equals(
                 "الحالة العسكرية الحالية"))
             return MILITARY_STATUS;
@@ -1167,15 +2015,20 @@ public class MainActivity extends Activity {
                 field.equals("الشهداء (نعم/لا)") ||
                 field.equals("مشاركة في خطط أمنية") ||
                 field.equals("قبض على قضايا") ||
-                field.equals("حسن سيرة وسلوك"))
+                field.equals("حسن سيرة وسلوك")) {
+
             return YES_NO;
+        }
 
         if (field.contains("مستوى القراءة") ||
                 field.contains("مستوى الكتابة") ||
-                field.contains("مستوى المحادثة"))
-            return LEVELS;
+                field.contains("مستوى المحادثة")) {
 
-        if (field.equals("نوع الوثيقة"))
+            return LEVELS;
+        }
+
+        if (field.equals("نوع الوثيقة")) {
+
             return new String[]{
                     "— اختر —",
                     "بطاقة شخصية",
@@ -1184,16 +2037,19 @@ public class MainActivity extends Activity {
                     "قرار",
                     "أخرى"
             };
+        }
 
         if (field.equals("تكليف بالمنصب"))
             return POSITION_TYPES;
 
-        if (field.equals("منطقة فرع الوسطى"))
+        if (field.equals("منطقة فرع الوسطى")) {
+
             return new String[]{
                     "— غير محدد —",
                     "إجدابيا",
                     "سرت"
             };
+        }
 
         if (field.equals("حالة المرتب"))
             return SALARY_STATUS;
@@ -1204,12 +2060,14 @@ public class MainActivity extends Activity {
         if (field.equals("حالة العضوية"))
             return MEMBERSHIP_STATUS;
 
-        if (field.equals("حالة العجز/التقييم"))
+        if (field.equals("حالة العجز/التقييم")) {
+
             return new String[]{
                     "لا يوجد عجز",
                     "عجز",
                     "غير خاضع للتقييم"
             };
+        }
 
         return YES_NO;
     }
@@ -1219,9 +2077,11 @@ public class MainActivity extends Activity {
         String[] result =
                 new String[15];
 
-        result[0] = "— اختر الدرجة —";
+        result[0] =
+                "— اختر الدرجة —";
 
         for (int i = 1; i <= 14; i++) {
+
             result[i] =
                     String.valueOf(i + 2);
         }
@@ -1230,18 +2090,17 @@ public class MainActivity extends Activity {
     }
 
     // =========================================================
-    // SAVE PERSONNEL
+    // SAVE FORM
     // =========================================================
 
     private void savePersonnel(
             LinkedHashMap<String, String> existing) {
 
         LinkedHashMap<String, String> record =
-                existing == null
-                        ? new LinkedHashMap<String, String>()
-                        : existing;
+                new LinkedHashMap<>();
 
-        for (String field : FIELDS) {
+        for (String field :
+                FIELDS) {
 
             View view =
                     formViews.get(field);
@@ -1255,7 +2114,8 @@ public class MainActivity extends Activity {
             }
         }
 
-        for (String field : EXTRA_FIELDS) {
+        for (String field :
+                EXTRA_FIELDS) {
 
             View view =
                     formViews.get(field);
@@ -1270,7 +2130,11 @@ public class MainActivity extends Activity {
         }
 
         String name =
-                safe(record.get("الاسم الثلاثي"));
+                safe(
+                        record.get(
+                                "الاسم الثلاثي"
+                        )
+                );
 
         if (name.equals("—")) {
 
@@ -1283,29 +2147,38 @@ public class MainActivity extends Activity {
         }
 
         String id =
-                safe(record.get("معرّف السجل"));
+                safe(
+                        record.get(
+                                "معرّف السجل"
+                        )
+                );
 
         if (id.equals("—")) {
-            id = generateRecordId();
-            record.put("معرّف السجل", id);
-        }
 
-        // العمر تلقائي
-        String birth =
-                safe(record.get("تاريخ الميلاد"));
-
-        if (!birth.equals("—")) {
-
-            String age =
-                    calculateAge(birth);
+            id =
+                    generateRecordId();
 
             record.put(
-                    "العمر (تلقائي)",
-                    age
+                    "معرّف السجل",
+                    id
             );
         }
 
-        // التقدير السنوي تلقائي
+        String birth =
+                safe(
+                        record.get(
+                                "تاريخ الميلاد"
+                        )
+                );
+
+        if (!birth.equals("—")) {
+
+            record.put(
+                    "العمر (تلقائي)",
+                    calculateAge(birth)
+            );
+        }
+
         String percentage =
                 safe(
                         record.get(
@@ -1323,7 +2196,7 @@ public class MainActivity extends Activity {
             );
         }
 
-        // الشهداء والمصابين والعجزة لا يدخلون التقييم
+        // قواعد التقييم
         String martyr =
                 safe(
                         record.get(
@@ -1366,28 +2239,27 @@ public class MainActivity extends Activity {
             );
         }
 
-        if (existing == null) {
+        // نحفظ في الذاكرة ثم في Room
+        int oldIndex =
+                findRecordIndex(id);
 
-            personnel.add(record);
+        if (oldIndex >= 0) {
+
+            personnel.set(
+                    oldIndex,
+                    record
+            );
 
         } else {
 
-            int index =
-                    findRecordIndex(id);
-
-            if (index >= 0) {
-                personnel.set(
-                        index,
-                        record
-                );
-            }
+            personnel.add(record);
         }
 
-        savePersonnel();
+        persistRecordToRoom(record);
 
         messageAndRun(
                 "تم الحفظ",
-                "تم حفظ بيانات المنتسب بنجاح.",
+                "تم حفظ بيانات المنتسب في المنظومة.",
                 new Runnable() {
                     @Override
                     public void run() {
@@ -1406,7 +2278,11 @@ public class MainActivity extends Activity {
 
         createPage(
                 "بطاقة المنتسب",
-                safe(record.get("الاسم الثلاثي"))
+                safe(
+                        record.get(
+                                "الاسم الثلاثي"
+                        )
+                )
         );
 
         addCardInfo(
@@ -1441,54 +2317,72 @@ public class MainActivity extends Activity {
 
         addCardInfo(
                 "الحالة العسكرية الحالية",
-                record.get("الحالة العسكرية الحالية")
+                record.get(
+                        "الحالة العسكرية الحالية"
+                )
         );
 
         addCardInfo(
                 "تكليف بالمنصب",
-                record.get("تكليف بالمنصب")
+                record.get(
+                        "تكليف بالمنصب"
+                )
         );
 
         addCardInfo(
                 "نوع التكليف",
-                record.get("نوع التكليف")
+                record.get(
+                        "نوع التكليف"
+                )
         );
 
         addCardInfo(
                 "حالة المرتب",
-                record.get("حالة المرتب")
+                record.get(
+                        "حالة المرتب"
+                )
         );
 
         addCardInfo(
                 "اسم المصرف",
-                record.get("اسم المصرف")
+                record.get(
+                        "اسم المصرف"
+                )
         );
 
         addCardInfo(
                 "اسم فرع المصرف",
-                record.get("اسم فرع المصرف")
+                record.get(
+                        "اسم فرع المصرف"
+                )
         );
 
         addCardInfo(
                 "رقم الحساب",
-                record.get("رقم الحساب")
+                record.get(
+                        "رقم الحساب"
+                )
         );
 
         addCardInfo(
                 "العمر",
-                record.get("العمر (تلقائي)")
+                record.get(
+                        "العمر (تلقائي)"
+                )
         );
 
         addCardInfo(
                 "حالة العضوية",
-                record.get("حالة العضوية")
+                record.get(
+                        "حالة العضوية"
+                )
         );
 
         addSpace(root, 10);
 
         Button edit =
                 createButton(
-                        "✏️ تعديل بيانات المنتسب",
+                        "تعديل بيانات المنتسب",
                         BLUE
                 );
 
@@ -1508,7 +2402,7 @@ public class MainActivity extends Activity {
 
         Button full =
                 createButton(
-                        "📋 عرض جميع البيانات",
+                        "عرض جميع البيانات",
                         GREEN
                 );
 
@@ -1528,7 +2422,7 @@ public class MainActivity extends Activity {
 
         Button financial =
                 createButton(
-                        "💳 البطاقة المالية",
+                        "البطاقة المالية",
                         ORANGE
                 );
 
@@ -1557,7 +2451,8 @@ public class MainActivity extends Activity {
                 "116 خانة + البيانات الإضافية"
         );
 
-        for (String field : FIELDS) {
+        for (String field :
+                FIELDS) {
 
             addCardInfo(
                     field,
@@ -1565,7 +2460,8 @@ public class MainActivity extends Activity {
             );
         }
 
-        for (String field : EXTRA_FIELDS) {
+        for (String field :
+                EXTRA_FIELDS) {
 
             addCardInfo(
                     field,
@@ -1584,12 +2480,12 @@ public class MainActivity extends Activity {
 
         createPage(
                 "البحث عن منتسب",
-                "بحث متعدد الحقول"
+                "بحث شامل داخل السجلات"
         );
 
         EditText query =
                 createEditText(
-                        "الاسم / الرقم الوطني / الرقم الحسابي / الرقم العسكري"
+                        "الاسم / الرقم الوطني / الرقم الحسابي"
                 );
 
         root.addView(
@@ -1599,7 +2495,7 @@ public class MainActivity extends Activity {
 
         Button search =
                 createButton(
-                        "🔎 بحث",
+                        "بحث",
                         GREEN
                 );
 
@@ -1631,13 +2527,17 @@ public class MainActivity extends Activity {
                                 query.getText()
                                         .toString()
                                         .trim()
-                                        .toLowerCase();
+                                        .toLowerCase(
+                                                Locale.ROOT
+                                        );
 
                         if (q.length() == 0) {
+
                             message(
                                     "البحث",
                                     "أدخل كلمة أو رقم."
                             );
+
                             return;
                         }
 
@@ -1689,6 +2589,7 @@ public class MainActivity extends Activity {
                                             @Override
                                             public void onClick(
                                                     View v) {
+
                                                 showPersonnelCard(
                                                         personnel.get(
                                                                 index
@@ -1703,6 +2604,7 @@ public class MainActivity extends Activity {
                         }
 
                         if (found == 0) {
+
                             emptyInto(
                                     results,
                                     "لا توجد نتائج مطابقة."
@@ -1716,15 +2618,16 @@ public class MainActivity extends Activity {
     }
 
     private boolean matches(
-            LinkedHashMap<String, String> r,
+            LinkedHashMap<String, String> record,
             String q) {
 
         for (String value :
-                r.values()) {
+                record.values()) {
 
             if (value != null &&
-                    value.toLowerCase()
-                            .contains(q)) {
+                    value.toLowerCase(
+                            Locale.ROOT
+                    ).contains(q)) {
 
                 return true;
             }
@@ -1768,8 +2671,7 @@ public class MainActivity extends Activity {
                                                 "الاسم الثلاثي"
                                         )
                                 ) +
-                                "\n" +
-                                "المصرف: " +
+                                "\nالمصرف: " +
                                 safe(
                                         r.get(
                                                 "اسم المصرف"
@@ -1796,6 +2698,7 @@ public class MainActivity extends Activity {
                         new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+
                                 showFinancialCard(
                                         personnel.get(index)
                                 );
@@ -1813,7 +2716,11 @@ public class MainActivity extends Activity {
 
         createPage(
                 "البطاقة المالية",
-                safe(r.get("الاسم الثلاثي"))
+                safe(
+                        r.get(
+                                "الاسم الثلاثي"
+                        )
+                )
         );
 
         addCardInfo(
@@ -1861,6 +2768,27 @@ public class MainActivity extends Activity {
                 r.get("حالة المرتب")
         );
 
+        addCardInfo(
+                "سبب إيقاف المرتب",
+                r.get(
+                        "سبب إيقاف المرتب"
+                )
+        );
+
+        addCardInfo(
+                "تاريخ حالة المرتب",
+                r.get(
+                        "تاريخ حالة المرتب"
+                )
+        );
+
+        addCardInfo(
+                "ملاحظات مالية",
+                r.get(
+                        "ملاحظات مالية"
+                )
+        );
+
         backDashboard();
     }
 
@@ -1872,11 +2800,11 @@ public class MainActivity extends Activity {
 
         createPage(
                 "الحركة والتكليف",
-                "أنواع الحركة المعتمدة"
+                "الحركة الإدارية والتكليفات"
         );
 
         addCardInfo(
-                "الأنواع",
+                "أنواع الحركة",
                 "تعيين\nنقل\nندب\nندب وزاري\n" +
                 "ندب وكيل وزارة الداخلية\nتكليف\nعقد"
         );
@@ -1902,12 +2830,46 @@ public class MainActivity extends Activity {
 
         createPage(
                 "التقارير والإحصائيات",
-                "أرقام مبنية على السجلات الفعلية"
+                "الموقف العام من السجلات المحفوظة"
         );
 
         addCardInfo(
                 "إجمالي المنتسبين",
-                String.valueOf(personnel.size())
+                String.valueOf(
+                        personnel.size()
+                )
+        );
+
+        addCardInfo(
+                "الضباط",
+                countExact(
+                        "الصفة الوظيفية",
+                        "ضابط"
+                )
+        );
+
+        addCardInfo(
+                "ضباط الصف",
+                countExact(
+                        "الصفة الوظيفية",
+                        "ضابط صف"
+                )
+        );
+
+        addCardInfo(
+                "الأفراد",
+                countExact(
+                        "الصفة الوظيفية",
+                        "فرد"
+                )
+        );
+
+        addCardInfo(
+                "الموظفون",
+                countExact(
+                        "الصفة الوظيفية",
+                        "موظف"
+                )
         );
 
         addCardInfo(
@@ -1935,6 +2897,46 @@ public class MainActivity extends Activity {
         );
 
         addCardInfo(
+                "مرتب لحظي",
+                countExact(
+                        "حالة المرتب",
+                        "مرتب لحظي"
+                )
+        );
+
+        addCardInfo(
+                "راتب حوافظ",
+                countExact(
+                        "حالة المرتب",
+                        "راتب حوافظ"
+                )
+        );
+
+        addCardInfo(
+                "منح",
+                countExact(
+                        "حالة المرتب",
+                        "منحة"
+                )
+        );
+
+        addCardInfo(
+                "لا يتقاضون مرتب",
+                countExact(
+                        "حالة المرتب",
+                        "لا يتقاضى مرتب"
+                )
+        );
+
+        addCardInfo(
+                "موقوف المرتب",
+                countExact(
+                        "حالة المرتب",
+                        "موقوف"
+                )
+        );
+
+        addCardInfo(
                 "الشهداء",
                 countExact(
                         "الشهداء (نعم/لا)",
@@ -1951,7 +2953,7 @@ public class MainActivity extends Activity {
         );
 
         addCardInfo(
-                "المنتسبون ذوو تكليف بالمنصب",
+                "ذوو تكليف بالمنصب",
                 countPositioned()
         );
 
@@ -1980,7 +2982,19 @@ public class MainActivity extends Activity {
         );
 
         addCardInfo(
-                "عدد الحقول الأساسية",
+                "قاعدة البيانات",
+                "Room / SQLite"
+        );
+
+        addCardInfo(
+                "حالة قاعدة البيانات",
+                databaseReady
+                        ? "جاهزة"
+                        : "جاري التحميل"
+        );
+
+        addCardInfo(
+                "الحقول الأساسية",
                 "116"
         );
 
@@ -1992,7 +3006,7 @@ public class MainActivity extends Activity {
         );
 
         addCardInfo(
-                "إجمالي الحقول في نموذج المنتسب",
+                "إجمالي حقول نموذج المنتسب",
                 String.valueOf(
                         FIELDS.length +
                         EXTRA_FIELDS.length
@@ -2000,7 +3014,7 @@ public class MainActivity extends Activity {
         );
 
         addCardInfo(
-                "السجلات المحفوظة",
+                "السجلات",
                 String.valueOf(
                         personnel.size()
                 )
@@ -2010,7 +3024,7 @@ public class MainActivity extends Activity {
     }
 
     // =========================================================
-    // END MEMBERSHIP
+    // MEMBERSHIP
     // =========================================================
 
     private void showEndMembership(
@@ -2018,7 +3032,11 @@ public class MainActivity extends Activity {
 
         createPage(
                 "إنهاء / إيقاف العضوية",
-                safe(record.get("الاسم الثلاثي"))
+                safe(
+                        record.get(
+                                "الاسم الثلاثي"
+                        )
+                )
         );
 
         Spinner reason =
@@ -2053,11 +3071,14 @@ public class MainActivity extends Activity {
                                         reason.getSelectedItem()
                                 );
 
-                        if (value.equals("— فعال —")) {
+                        if (value.equals(
+                                "— فعال —")) {
+
                             message(
                                     "الحالة",
-                                    "اختر سبب الإنهاء أو الإيقاف."
+                                    "اختر سبب الإنهاء."
                             );
+
                             return;
                         }
 
@@ -2071,7 +3092,30 @@ public class MainActivity extends Activity {
                                 value
                         );
 
-                        savePersonnel();
+                        record.put(
+                                "الحالة العسكرية الحالية",
+                                "منتهي الخدمة"
+                        );
+
+                        int index =
+                                findRecordIndex(
+                                        safe(
+                                                record.get(
+                                                        "معرّف السجل"
+                                                )
+                                        )
+                                );
+
+                        if (index >= 0) {
+                            personnel.set(
+                                    index,
+                                    record
+                            );
+                        }
+
+                        persistRecordToRoom(
+                                record
+                        );
 
                         messageAndRun(
                                 "تم التحديث",
@@ -2091,7 +3135,7 @@ public class MainActivity extends Activity {
     }
 
     // =========================================================
-    // PAGE BUILDER
+    // PAGE
     // =========================================================
 
     private void createPage(
@@ -2183,7 +3227,6 @@ public class MainActivity extends Activity {
                 margin(-1, 82, 0, 18, 0, 0)
         );
 
-        // هذا هو المحتوى الحقيقي للـActivity
         setContentView(scroll);
     }
 
@@ -2214,6 +3257,7 @@ public class MainActivity extends Activity {
         );
 
         if (bold) {
+
             t.setTypeface(
                     Typeface.DEFAULT,
                     Typeface.BOLD
@@ -2233,6 +3277,7 @@ public class MainActivity extends Activity {
         e.setTextSize(16);
         e.setTextColor(DARK);
         e.setHintTextColor(GRAY);
+
         e.setGravity(
                 Gravity.RIGHT |
                 Gravity.CENTER_VERTICAL
@@ -2307,7 +3352,10 @@ public class MainActivity extends Activity {
         b.setAllCaps(false);
         b.setMinHeight(0);
         b.setMinimumHeight(0);
-        b.setGravity(Gravity.CENTER);
+
+        b.setGravity(
+                Gravity.CENTER
+        );
 
         b.setPadding(
                 dp(10),
@@ -2349,7 +3397,9 @@ public class MainActivity extends Activity {
                 margin(-1, 58, 0, 9, 0, 0)
         );
 
-        b.setOnClickListener(listener);
+        b.setOnClickListener(
+                listener
+        );
     }
 
     private void addStatCard(
@@ -2518,7 +3568,9 @@ public class MainActivity extends Activity {
                         false
                 );
 
-        t.setGravity(Gravity.CENTER);
+        t.setGravity(
+                Gravity.CENTER
+        );
 
         parent.addView(
                 t,
@@ -2532,7 +3584,7 @@ public class MainActivity extends Activity {
 
         Button b =
                 createButton(
-                        "← العودة إلى لوحة القيادة",
+                        "العودة إلى لوحة القيادة",
                         DARK_GREEN
                 );
 
@@ -2552,10 +3604,14 @@ public class MainActivity extends Activity {
     }
 
     // =========================================================
-    // PERSISTENCE
+    // SHARED PREFERENCES BACKUP
     // =========================================================
 
-    private void savePersonnel() {
+    private void saveLegacyBackup() {
+
+        if (prefs == null) {
+            return;
+        }
 
         StringBuilder all =
                 new StringBuilder();
@@ -2565,7 +3621,9 @@ public class MainActivity extends Activity {
              i++) {
 
             if (i > 0) {
-                all.append("§§RECORD§§");
+                all.append(
+                        "§§RECORD§§"
+                );
             }
 
             LinkedHashMap<String, String> record =
@@ -2573,23 +3631,32 @@ public class MainActivity extends Activity {
 
             boolean first = true;
 
-            for (Map.Entry<String, String> e :
+            for (Map.Entry<String, String> entry :
                     record.entrySet()) {
 
                 if (!first) {
-                    all.append("§§FIELD§§");
+
+                    all.append(
+                            "§§FIELD§§"
+                    );
                 }
 
                 first = false;
 
                 all.append(
-                        encode(e.getKey())
+                        encode(
+                                entry.getKey()
+                        )
                 );
 
-                all.append("§§VALUE§§");
+                all.append(
+                        "§§VALUE§§"
+                );
 
                 all.append(
-                        encode(e.getValue())
+                        encode(
+                                entry.getValue()
+                        )
                 );
             }
         }
@@ -2605,6 +3672,10 @@ public class MainActivity extends Activity {
     private void loadPersonnel() {
 
         personnel.clear();
+
+        if (prefs == null) {
+            return;
+        }
 
         String data =
                 prefs.getString(
@@ -2653,7 +3724,10 @@ public class MainActivity extends Activity {
             }
 
             if (!record.isEmpty()) {
-                personnel.add(record);
+
+                personnel.add(
+                        record
+                );
             }
         }
     }
@@ -2695,7 +3769,8 @@ public class MainActivity extends Activity {
     // HELPERS
     // =========================================================
 
-    private String readValue(View view) {
+    private String readValue(
+            View view) {
 
         if (view instanceof EditText) {
 
@@ -2740,6 +3815,7 @@ public class MainActivity extends Activity {
                     )) {
 
                 spinner.setSelection(i);
+
                 return;
             }
         }
@@ -2751,9 +3827,8 @@ public class MainActivity extends Activity {
         return field.contains("عدد") ||
                 field.contains("النسبة") ||
                 field.contains("درجة") ||
-                field.contains("رقم") ||
                 field.contains("شهر") ||
-                field.contains("يوم");
+                field.equals("يوم متبقي");
     }
 
     private boolean isLongText(
@@ -2769,7 +3844,8 @@ public class MainActivity extends Activity {
                 field.contains("السلاح") ||
                 field.contains("اللاسلكي") ||
                 field.contains("المركبة") ||
-                field.contains("معدات");
+                field.contains("معدات") ||
+                field.contains("ملاحظات مالية");
     }
 
     private String generateRecordId() {
@@ -2793,6 +3869,7 @@ public class MainActivity extends Activity {
                                     )
                     )
             )) {
+
                 return i;
             }
         }
@@ -2810,7 +3887,9 @@ public class MainActivity extends Activity {
                 personnel) {
 
             String value =
-                    safe(r.get(field));
+                    safe(
+                            r.get(field)
+                    );
 
             if (value.contains(contains)) {
                 count++;
@@ -2830,8 +3909,11 @@ public class MainActivity extends Activity {
                 personnel) {
 
             if (value.equals(
-                    safe(r.get(field))
+                    safe(
+                            r.get(field)
+                    )
             )) {
+
                 count++;
             }
         }
@@ -2853,8 +3935,12 @@ public class MainActivity extends Activity {
                             )
                     );
 
-            if (!value.equals("—") &&
-                    !value.contains("بدون")) {
+            if (!value.equals(
+                    "—"
+            ) &&
+                    !value.contains(
+                            "بدون"
+                    )) {
 
                 count++;
             }
@@ -2939,10 +4025,17 @@ public class MainActivity extends Activity {
                                     .trim()
                     );
 
-            if (p >= 90) return "ممتاز";
-            if (p >= 80) return "جيد جدًا";
-            if (p >= 70) return "جيد";
-            if (p >= 60) return "مقبول";
+            if (p >= 90)
+                return "ممتاز";
+
+            if (p >= 80)
+                return "جيد جدًا";
+
+            if (p >= 70)
+                return "جيد";
+
+            if (p >= 60)
+                return "مقبول";
 
             return "ضعيف";
 
@@ -2963,6 +4056,32 @@ public class MainActivity extends Activity {
         return value;
     }
 
+    private String safeForStorage(
+            String value) {
+
+        if (value == null) {
+            return "";
+        }
+
+        return value.trim();
+    }
+
+    private String safeException(
+            Exception e) {
+
+        if (e == null) {
+            return "خطأ غير معروف";
+        }
+
+        String message =
+                e.getMessage();
+
+        return message == null ||
+                message.trim().length() == 0
+                ? e.getClass().getSimpleName()
+                : message;
+    }
+
     private String join(
             String[] values) {
 
@@ -2977,7 +4096,9 @@ public class MainActivity extends Activity {
                 b.append("\n");
             }
 
-            b.append(values[i]);
+            b.append(
+                    values[i]
+            );
         }
 
         return b.toString();
@@ -3011,13 +4132,14 @@ public class MainActivity extends Activity {
                 .setMessage(body)
                 .setPositiveButton(
                         "متابعة",
-                        (dialog, which) -> action.run()
+                        (dialog, which) ->
+                                action.run()
                 )
                 .show();
     }
 
     // =========================================================
-    // LAYOUT HELPERS
+    // LAYOUT
     // =========================================================
 
     private LinearLayout.LayoutParams lp(
@@ -3029,63 +4151,11 @@ public class MainActivity extends Activity {
                         ? ViewGroup.LayoutParams.MATCH_PARENT
                         : width == -2
                         ? ViewGroup.LayoutParams.WRAP_CONTENT
-                        : dp(width);
+                        : width;
 
         int h =
                 height == -1
                         ? ViewGroup.LayoutParams.MATCH_PARENT
                         : height == -2
                         ? ViewGroup.LayoutParams.WRAP_CONTENT
-                        : dp(height);
-
-        return new LinearLayout.LayoutParams(
-                w,
-                h
-        );
-    }
-
-    private LinearLayout.LayoutParams margin(
-            int width,
-            int height,
-            int left,
-            int top,
-            int right,
-            int bottom) {
-
-        LinearLayout.LayoutParams p =
-                lp(width, height);
-
-        p.setMargins(
-                dp(left),
-                dp(top),
-                dp(right),
-                dp(bottom)
-        );
-
-        return p;
-    }
-
-    private void addSpace(
-            LinearLayout parent,
-            int height) {
-
-        View v =
-                new View(this);
-
-        parent.addView(
-                v,
-                lp(-1, height)
-        );
-    }
-
-    private int dp(int value) {
-
-        return (int) (
-                value *
-                getResources()
-                        .getDisplayMetrics()
-                        .density
-                        + 0.5f
-        );
-    }
-}
+                        : height;
