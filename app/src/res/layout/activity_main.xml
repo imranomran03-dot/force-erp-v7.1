@@ -12,7 +12,7 @@
         android:padding="14dp"
         android:layoutDirection="rtl">
 
-        <!-- رأس لوحة القيادة -->
+        <!-- رأس النظام -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -69,9 +69,10 @@
                 android:gravity="center" />
 
             <TextView
+                android:id="@+id/txtTotal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="1,250"
+                android:text="0"
                 android:textColor="#1B5E20"
                 android:textSize="38sp"
                 android:textStyle="bold"
@@ -116,9 +117,10 @@
                     android:gravity="center" />
 
                 <TextView
+                    android:id="@+id/txtOfficers"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="180"
+                    android:text="0"
                     android:textSize="27sp"
                     android:textStyle="bold"
                     android:textColor="#1B5E20"
@@ -147,9 +149,10 @@
                     android:gravity="center" />
 
                 <TextView
+                    android:id="@+id/txtNcos"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="420"
+                    android:text="0"
                     android:textSize="27sp"
                     android:textStyle="bold"
                     android:textColor="#1B5E20"
@@ -187,9 +190,10 @@
                     android:gravity="center" />
 
                 <TextView
+                    android:id="@+id/txtIndividuals"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="530"
+                    android:text="0"
                     android:textSize="27sp"
                     android:textStyle="bold"
                     android:textColor="#1B5E20"
@@ -218,9 +222,10 @@
                     android:gravity="center" />
 
                 <TextView
+                    android:id="@+id/txtEmployees"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="120"
+                    android:text="0"
                     android:textSize="27sp"
                     android:textStyle="bold"
                     android:textColor="#1B5E20"
@@ -250,50 +255,56 @@
             android:padding="15dp">
 
             <TextView
+                android:id="@+id/txtActive"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="مستمرون     82%"
+                android:text="مستمرون     0%"
                 android:textSize="16sp"
                 android:textColor="#1B5E20"
                 android:textStyle="bold"
                 android:padding="6dp" />
 
             <TextView
+                android:id="@+id/txtAssigned"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="مكلفون       8%"
+                android:text="مكلفون       0%"
                 android:textSize="16sp"
                 android:textColor="#555555"
                 android:padding="6dp" />
 
             <TextView
+                android:id="@+id/txtDelegated"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="منتدبون      4%"
+                android:text="منتدبون      0%"
                 android:textSize="16sp"
                 android:textColor="#555555"
                 android:padding="6dp" />
 
             <TextView
+                android:id="@+id/txtStopped"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="موقوفون     2%"
+                android:text="موقوفون     0%"
                 android:textSize="16sp"
                 android:textColor="#B71C1C"
                 android:padding="6dp" />
 
             <TextView
+                android:id="@+id/txtLeave"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="إجازة         3%"
+                android:text="إجازة         0%"
                 android:textSize="16sp"
                 android:textColor="#555555"
                 android:padding="6dp" />
 
             <TextView
+                android:id="@+id/txtCourses"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="دورات        6%"
+                android:text="دورات        0%"
                 android:textSize="16sp"
                 android:textColor="#555555"
                 android:padding="6dp" />
@@ -337,9 +348,10 @@
                     android:gravity="center" />
 
                 <TextView
+                    android:id="@+id/txtAlerts"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="24"
+                    android:text="0"
                     android:textSize="28sp"
                     android:textStyle="bold"
                     android:textColor="#E65100"
@@ -367,9 +379,10 @@
                     android:gravity="center" />
 
                 <TextView
+                    android:id="@+id/txtMissing"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="17"
+                    android:text="0"
                     android:textSize="28sp"
                     android:textStyle="bold"
                     android:textColor="#B71C1C"
@@ -406,9 +419,10 @@
                     android:gravity="center" />
 
                 <TextView
+                    android:id="@+id/txtPromotions"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="9"
+                    android:text="0"
                     android:textSize="28sp"
                     android:textStyle="bold"
                     android:textColor="#1B5E20"
@@ -436,9 +450,10 @@
                     android:gravity="center" />
 
                 <TextView
+                    android:id="@+id/txtDecisions"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="6"
+                    android:text="0"
                     android:textSize="28sp"
                     android:textStyle="bold"
                     android:textColor="#1565C0"
@@ -463,52 +478,52 @@
             android:id="@+id/btnPersonnel"
             android:layout_width="match_parent"
             android:layout_height="55dp"
-            android:text="👥  المنتسبون"
+            android:text="المنتسبون"
             android:textSize="16sp" />
 
         <Button
             android:id="@+id/btnSearch"
             android:layout_width="match_parent"
             android:layout_height="55dp"
-            android:text="🔎  البحث عن منتسب"
+            android:text="البحث عن منتسب"
             android:textSize="16sp" />
 
         <Button
             android:id="@+id/btnReports"
             android:layout_width="match_parent"
             android:layout_height="55dp"
-            android:text="📊  التقارير والإحصائيات"
+            android:text="التقارير والإحصائيات"
             android:textSize="16sp" />
 
         <Button
             android:id="@+id/btnFinancial"
             android:layout_width="match_parent"
             android:layout_height="55dp"
-            android:text="💰  البطاقة المالية"
+            android:text="البطاقة المالية"
             android:textSize="16sp" />
 
         <Button
             android:id="@+id/btnCourses"
             android:layout_width="match_parent"
             android:layout_height="55dp"
-            android:text="🎓  الدورات والمؤهلات"
+            android:text="الدورات والمؤهلات"
             android:textSize="16sp" />
 
         <Button
             android:id="@+id/btnMovement"
             android:layout_width="match_parent"
             android:layout_height="55dp"
-            android:text="🔄  الحركة والتنقلات"
+            android:text="الحركة والتنقلات"
             android:textSize="16sp" />
 
         <Button
             android:id="@+id/btnSettings"
             android:layout_width="match_parent"
             android:layout_height="55dp"
-            android:text="⚙  الإعدادات"
+            android:text="الإعدادات"
             android:textSize="16sp" />
 
-        <!-- الأرشيف -->
+        <!-- الأرشيف الإلكتروني -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
